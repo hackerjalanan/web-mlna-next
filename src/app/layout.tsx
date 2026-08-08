@@ -24,9 +24,17 @@ export default function RootLayout({
 }>) {
   return (
     <html
+   
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+       <head>
+        <link
+          rel="icon"
+          href="logo-am.svg"
+          type="image/svg"
+        />
+      </head>
       <body className="min-h-full bg-slate-950 text-white">
         {children}
       </body>

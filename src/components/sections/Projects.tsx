@@ -19,10 +19,10 @@ const projects = [
   },
 ];
 
-export default function Projects() {
+export default function Projectss() {
   return (
     <section id="projects" className="px-6 py-24">
-      <div className="mx-auto max-w-6xl">
+      <div className="">
         <p className="text-sm uppercase tracking-[0.3em] text-cyan-400">
           Projects
         </p>

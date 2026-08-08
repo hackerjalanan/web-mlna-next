@@ -2,11 +2,10 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="flex min-h-screen items-center px-6 pt-20"
+      className="flex items-center px-6 "
     >
-      <div className="mx-auto w-full max-w-6xl">
         <div className="max-w-3xl">
-          <p className="mb-4 text-sm font-medium uppercase tracking-[0.3em] text-cyan-400">
+          <p className="    text-sm font-medium uppercase tracking-[0.3em] text-cyan-400">
             Hello, I'm
           </p>
 
@@ -47,7 +46,6 @@ export default function Hero() {
             <span>Node.js</span>
           </div>
         </div>
-      </div>
     </section>
   );
 }
