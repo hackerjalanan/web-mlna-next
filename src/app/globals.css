@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050b14;
+  --foreground: #f8fafc;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: #22d3ee;
+  color: #050b14;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050b14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #164e63;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #22d3ee;
+}
+
+
+.logo-gradient {
+  background: linear-gradient(
+    0deg,
+  #2fff7b 0%,
+  #0ddbff 16%,
+  #3b82f6 32%,
+  #ff5168 48%,
+  #3aff82 64%,
+  #0ddbff 80%,
+  #2fff7b 100%
+  );
+
+  background-size: 100% 300%;
+
+  -webkit-mask-image: url("/image/logo-am.svg");
+  mask-image: url("/image/logo-am.svg");
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  -webkit-mask-position: center;
+  mask-position: center;
+
+  -webkit-mask-size: contain;
+  mask-size: contain;
+
+  animation: logo-gradient-flow 4s linear infinite;
+}
+
+@keyframes logo-gradient-flow {
+  from {
+    background-position: 50% 0%;
+  }
+
+  to {
+    background-position: 50% 100%;
+  }
 }
