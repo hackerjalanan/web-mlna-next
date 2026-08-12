@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Breadcrumb from "@/components/layout/Breadcrumb";
+import FireworkButton from "@/components/sections/FireworkButton";
 
 export default function MainLayout({
   children,
@@ -22,13 +23,14 @@ export default function MainLayout({
           ${open ? "md:ml-60" : "md:ml-20"}
         `}
       >
-        {/* Breadcrumb otomatis di semua halaman */}
-        <div className="mx-auto max-w-[1440px] ">
+        <div className="mx-auto max-w-[1440px]">
           <Breadcrumb />
         </div>
 
         {children}
-      </main> 
+      </main>
+
+      <FireworkButton />
     </>
   );
 }
