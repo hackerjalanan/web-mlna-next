@@ -219,39 +219,58 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
           MOBILE HEADER
       ====================================================== */}
 
-      <div className="fixed left-0 top-0 z-40 flex w-full items-center justify-center border-b border-white/10 bg-slate-900/95 py-3 backdrop-blur-xl md:hidden">
-        <div
-          className={`logo-gradient ${
-            open ? "h-10 w-12" : "h-10 w-14"
-          }`}
-          aria-label="MlnA Logo"
-        />
+<div className="fixed left-0 top-0 z-40 flex h-11 w-full items-center justify-center border-b border-white/10 bg-slate-900/95 backdrop-blur-xl md:hidden">
+  <div
+    className={`logo-gradient ${
+      open ? "h-12 w-11" : "h-12 w-11"
+    }`}
+    aria-label="MlnA Logo"
+  />
 
-        <h1 className="ml-2 text-lg font-bold text-white">
-          MlnA
-        </h1>
-      </div>
+  <h1 className="ml-[2px] text-base font-bold text-white">
+    MlnA
+  </h1>
+</div>
 
       {/* =====================================================
           MOBILE BOTTOM NAVIGATION
       ====================================================== */}
 
-      <nav className="fixed bottom-0 left-0 z-50 grid w-full grid-cols-4 border-t border-white/10 bg-slate-900/95 px-2 py-2 text-white backdrop-blur-xl md:hidden">
+      <nav
+        className="
+          fixed bottom-0 left-0 z-50
+          grid w-full
+          border-t border-white/10
+          bg-slate-900/95
+          px-2 py-2
+          text-white
+          backdrop-blur-xl
+          md:hidden
+        "
+        style={{
+          gridTemplateColumns: `repeat(${menuItems.length}, minmax(0, 1fr))`,
+        }}
+      >
         {menuItems.map((item) => (
           <a
             key={item.name}
             href={item.href}
             title={item.name}
             onClick={() => handleMenuClick(item.href)}
-            className={`flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all duration-200 active:scale-95 ${
-              getActiveClass(item.href)
-            }`}
+            className={`
+              flex flex-col
+              items-center justify-center
+              gap-1 rounded-xl py-2
+              transition-all duration-200
+              active:scale-95
+              ${getActiveClass(item.href)}
+            `}
           >
             <span className="flex h-6 w-6 items-center justify-center">
               {item.icon}
             </span>
 
-            <span className="text-xs font-medium">
+            <span className="text-[10px] font-medium">
               {item.name}
             </span>
           </a>

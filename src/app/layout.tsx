@@ -1,20 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import MainLayout from "@/components/layout/MainLayout";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "MlnA | Portfolio",
-  description: "Personal portfolio of MlnA",
+  title: "Ade Maulana",
+  description: "Personal portfolio of Ade Maulana",
 };
 
 export default function RootLayout({
@@ -23,20 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-   
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-       <head>
-        <link
-          rel="icon"
-          href="logo-am.svg"
-          type="image/svg"
-        />
-      </head>
-      <body className="min-h-full bg-slate-950 text-white">
-        {children}
+    <html lang="id">
+      <body>
+        <MainLayout>
+          {children}
+        </MainLayout>
       </body>
     </html>
   );

@@ -18,7 +18,7 @@ export default function MainLayout({
 
       <main
         className={`min-h-screen transition-all duration-300
-          pt-20 pb-24
+          pt- pb-24
           md:pt-0 md:pb-0
           ${open ? "md:ml-60" : "md:ml-20"}
         `}
