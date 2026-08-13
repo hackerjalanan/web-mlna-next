@@ -92,7 +92,7 @@ export default function Projects() {
             FILTER
         ====================================================== */}
 
-        <div className="flex flex-col gap-4 rounded-lg border border-slate-700/50 bg-slate-950/50 p-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="sticky top-0 z-50 flex flex-col gap-4 rounded-lg border border-slate-700/50 bg-slate-950/95 p-4 backdrop-blur-md lg:flex-row lg:items-center lg:justify-between">
           {/* CATEGORY */}
 
           <div className="flex flex-wrap gap-2">

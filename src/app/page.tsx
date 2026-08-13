@@ -1,7 +1,4 @@
-import Hero from "@/components/sections/Hero";
-import About from "@/components/sections/About";
-import Projects from "@/components/sections/Projects";
-import Footer from "@/components/layout/Footer";
+
 import QuickProfile from "@/components/sections/QuickProfile";
 import Skills from "@/components/sections/Skills";
 import FeaturedProjects from "@/components/sections/FeaturedProjects";
