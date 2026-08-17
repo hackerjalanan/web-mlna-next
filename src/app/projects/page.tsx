@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { projects, type Project } from "@/data/projects";
 import Link from "next/link";
+import { ChevronDown, Search  } from "lucide-react";
 
 type SortOption = "newest" | "oldest" | "name";
 
@@ -16,17 +17,35 @@ const categories = [
 
 type Category = (typeof categories)[number];
 
+
+
+
 export default function Projects() {
   const [activeCategory, setActiveCategory] =
     useState<Category>("Semua");
+
+
 
   const [search, setSearch] = useState("");
 
   const [sortBy, setSortBy] =
     useState<SortOption>("newest");
 
+
+
+
+  const [sortOpen, setSortOpen] = useState(false);
+
+  const sortOptions = [
+    { value: "newest", label: "Terbaru" },
+    { value: "oldest", label: "Terlama" },
+    { value: "name", label: "Nama A-Z" },
+  ];
+
+
   const filteredProjects = useMemo(() => {
     const keyword = search.trim().toLowerCase();
+
 
     return projects
       .filter((project) => {
@@ -92,10 +111,10 @@ export default function Projects() {
             FILTER
         ====================================================== */}
 
-        <div className="sticky top-0 z-50 flex flex-col gap-4 rounded-lg border border-slate-700/50 bg-slate-950/95 p-4 backdrop-blur-md lg:flex-row lg:items-center lg:justify-between">
+        <div className="sticky top-10 z-[100] flex flex-col gap-2 overflow-visible rounded-lg border border-slate-700/50 bg-slate-950/95 p-4 backdrop-blur-md min-[920px]:flex-row min-[920px]:items-center min-[920px]:justify-between">
           {/* CATEGORY */}
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex w-full flex-wrap items-center justify-between gap-2">
             {categories.map((category) => {
               const active =
                 activeCategory === category;
@@ -104,10 +123,8 @@ export default function Projects() {
                 <button
                   key={category}
                   type="button"
-                  onClick={() =>
-                    setActiveCategory(category)
-                  }
-                  className={`rounded-lg px-3 py-1.5 text-[11px] font-semibold transition ${
+                  onClick={() => setActiveCategory(category)}
+                  className={`flex-1 min-w-max whitespace-nowrap rounded-lg px-3 py-1.5 text-[11px] font-semibold transition ${
                     active
                       ? "bg-sky-500 text-slate-950 hover:bg-sky-400"
                       : "border border-slate-700 text-slate-300 hover:border-sky-500 hover:text-white"
@@ -120,61 +137,77 @@ export default function Projects() {
           </div>
 
           {/* SEARCH + SORT */}
-
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex gap-2 overflow-visible">
             {/* SEARCH */}
+            <div className="relative w-full sm:flex-1">
+              <Search
+                size={14}
+                className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-slate-500"
+              />
 
-            <div className="relative">
               <input
                 type="text"
                 value={search}
-                onChange={(e) =>
-                  setSearch(e.target.value)
-                }
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Cari proyek..."
-                className="w-full rounded-lg border border-slate-700 bg-slate-900/80 py-1.5 pl-9 pr-3 text-xs text-white outline-none placeholder:text-slate-500 focus:border-sky-500 sm:w-48"
+                className="box-border w-full rounded-lg border border-slate-700 bg-slate-900/80 py-2 pl-9 pr-3 text-xs text-white outline-none placeholder:text-slate-500 focus:border-sky-500"
               />
-
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
-                />
-              </svg>
             </div>
 
-            {/* SORT */}
-
-            <select
-              value={sortBy}
-              onChange={(e) =>
-                setSortBy(
-                  e.target.value as SortOption,
-                )
-              }
-              className="rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-white outline-none focus:border-sky-500"
+          {/* SORT */}
+          <div className="relative z-[200] w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => {
+                console.log("SORT CLICK");
+                setSortOpen((prev) => !prev);
+              }}
+              className="relative z-[201] flex w-full min-w-[120px] items-center justify-between gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-medium text-white active:bg-slate-800 sm:w-[120px]"
             >
-              <option value="newest">
-                Terbaru
-              </option>
+              <span>
+                {
+                  sortOptions.find(
+                    (option) => option.value === sortBy,
+                  )?.label
+                }
+              </span>
 
-              <option value="oldest">
-                Terlama
-              </option>
+              <ChevronDown
+                size={14}
+                className={`transition-transform ${
+                  sortOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
-              <option value="name">
-                Nama A-Z
-              </option>
-            </select>
+            {sortOpen && (
+              <div className="absolute right-0 top-full z-[9999] mt-2 w-full min-w-[140px] overflow-hidden rounded-lg border border-slate-700 bg-slate-900 shadow-2xl">
+                {sortOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      setSortBy(option.value as SortOption);
+                      setSortOpen(false);
+                    }}
+                    className={`flex w-full px-4 py-3 text-left text-xs ${
+                      sortBy === option.value
+                        ? "bg-sky-500/10 text-sky-400"
+                        : "text-slate-300 active:bg-slate-800"
+                    }`}
+                  >
+                    {sortBy === option.value && (
+                      <span className="mr-2">✓</span>
+                    )}
+
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+          </div>
+        
         </div>
 
         {/* =====================================================
