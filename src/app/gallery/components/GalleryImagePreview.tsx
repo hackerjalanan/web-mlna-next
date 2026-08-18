@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import {
   TransformWrapper,
   TransformComponent,
 } from "react-zoom-pan-pinch";
-import { X } from "lucide-react";
+import { X, RefreshCw } from "lucide-react";
 import type { GalleryItem } from "@/data/gallery";
 
 interface GalleryImagePreviewProps {
@@ -18,6 +19,14 @@ export default function GalleryImagePreview({
   isLoading,
   onClose,
 }: GalleryImagePreviewProps) {
+  const [hasError, setHasError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+
+  const handleRetry = () => {
+    setHasError(false);
+    setRetryKey((k) => k + 1);
+  };
+
   return (
     <div
       onContextMenu={(e) => e.preventDefault()}
@@ -80,8 +89,34 @@ export default function GalleryImagePreview({
             </div>
           )}
 
-          {!isLoading && (
+          {!isLoading && hasError && (
+            <div className="flex h-[300px] w-[300px] flex-col items-center justify-center gap-3 text-center">
+              <p className="text-xs text-slate-400">
+                Gambar gagal dimuat.
+                <br />
+                Coba lagi atau periksa link sumber gambar.
+              </p>
+
+              <button
+                type="button"
+                onClick={handleRetry}
+                className="
+                  flex items-center gap-1.5
+                  rounded-md border border-white/10
+                  bg-white/5 px-3 py-1.5
+                  text-xs text-slate-300
+                  hover:bg-white/10 hover:text-white
+                "
+              >
+                <RefreshCw size={13} />
+                Coba lagi
+              </button>
+            </div>
+          )}
+
+          {!isLoading && !hasError && (
             <TransformWrapper
+              key={retryKey}
               initialScale={1}
               minScale={1}
               maxScale={4}
@@ -98,6 +133,8 @@ export default function GalleryImagePreview({
                   src={item.image}
                   alt={item.title}
                   draggable={false}
+                  referrerPolicy="no-referrer"
+                  onError={() => setHasError(true)}
                   className="
                     block
                     max-h-[80vh]

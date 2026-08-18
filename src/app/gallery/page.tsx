@@ -59,7 +59,7 @@ export default function Gallery() {
 
   return (
     <section className="min-h-screen px-2 md:px-4">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-[1440px]">
         {/* Header */}
         <div className="mb-8">
           <p className="mb-2 text-sm text-cyan-400">MY COLLECTION</p>
