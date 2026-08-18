@@ -11,7 +11,7 @@ const slides = [
   {
     id: 1,
     label: "HELLO, I'M",
-    title: "Ade Maulana",
+    title: "Ade Maulana Hidayah",
     subtitle: "Fullstack Developer",
     description:
       "Saya membangun aplikasi web modern dengan fokus pada performa, pengalaman pengguna, dan solusi yang dapat diandalkan.",
