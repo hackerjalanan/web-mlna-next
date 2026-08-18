@@ -32,7 +32,7 @@ const stats = [
 
 export default function QuickProfile() {
   return (
-    <section className="px-6 py-12 md:px-10 lg:px-14">
+    <section className="px-3 py-12 md:px-3 lg:px-4">
       <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
         {/* Description */}
         <div>

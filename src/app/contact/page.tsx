@@ -2,338 +2,137 @@
 
 import { useState } from "react";
 import {
-  Mail,
-  MapPin,
-  Code2,
-  BriefcaseBusiness,
-  Send,
-} from "lucide-react";
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaGithub,
+  FaLinkedin,
+  FaInstagram,
+  FaGlobe,
+  FaPaperPlane,
+} from "react-icons/fa";
+
+const SOCIALS = [
+  { icon: FaGithub, label: "GitHub", value: "ademlna", href: "https://github.com/ademlna" },
+  { icon: FaLinkedin, label: "LinkedIn", value: "ade-mlna", href: "https://linkedin.com/in/ade-mlna" },
+  { icon: FaInstagram, label: "Instagram", value: "ade_mlna", href: "https://instagram.com/ade_mlna" },
+  { icon: FaGlobe, label: "Website", value: "ade-maulana.my.id", href: "https://ade-maulana.my.id" },
+];
+
+const FIELDS = [
+  { name: "name", label: "Name", type: "text", placeholder: "Your name" },
+  { name: "email", label: "Email", type: "email", placeholder: "you@example.com" },
+  { name: "subject", label: "Subject", type: "text", placeholder: "Project discussion" },
+];
+
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/50";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement
-    >,
-  ) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     console.log(form);
-
-    // Nanti bisa dihubungkan ke:
-    // API Route / Resend / Formspree / backend sendiri
+    // TODO: hubungkan ke API Route / Resend / Formspree
   };
 
   return (
-    <main className="min-h-screen px-4 py-10 md:px-8">
-      <div className="mx-auto max-w-6xl">
-
-        {/* Header */}
+    <main className="min-h-screen px-3 py-3  md:px-3">
+      <div className="mx-auto max-w-[1440px]">   
         <section className="mb-10 max-w-2xl">
-          <p className="mb-3 text-sm text-cyan-400">
-            CONTACT
-          </p>
-
-          <h1 className="
-            text-3xl font-bold
-            tracking-tight text-white
-            md:text-5xl
-          ">
+          <p className="mb-3 text-sm text-cyan-400">CONTACT</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
             Mari terhubung.
           </h1>
-
-          <p className="
-            mt-4
-            text-sm leading-7
-            text-slate-400
-          ">
-            Jika kamu memiliki project, peluang kerja,
-            atau ingin berdiskusi mengenai development,
-            jangan ragu untuk menghubungi saya.
+          <p className="mt-4 text-sm leading-7 text-slate-400">
+            Jika kamu memiliki project, peluang kerja, atau ingin berdiskusi
+            mengenai development, jangan ragu untuk menghubungi saya.
           </p>
         </section>
 
-        <div className="
-          grid gap-8
-          lg:grid-cols-[0.8fr_1.2fr]
-        ">
-
+        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           {/* Contact Info */}
           <section>
-            <h2 className="mb-5 text-lg font-semibold text-white">
-              Contact Information
-            </h2>
+            <h2 className="mb-5 text-lg font-semibold text-white">Contact Information</h2>
 
             <div className="space-y-3">
-
               <a
-                href="mailto:your@email.com"
-                className="
-                  flex items-center gap-4
-                  rounded-xl
-                  border border-white/10
-                  bg-slate-900/50
-                  p-4
-                  transition-colors
-                  hover:border-cyan-400/30
-                "
+                href="mailto:ade.maulana@example.com"
+                className="flex items-center gap-4 rounded-xl border border-white/10 bg-slate-900/50 p-4 transition-colors hover:border-cyan-400/30"
               >
-                <div className="
-                  flex h-10 w-10
-                  items-center justify-center
-                  rounded-lg
-                  bg-cyan-400/10
-                  text-cyan-400
-                ">
-                  <Mail size={18} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-400">
+                  <FaEnvelope size={18} />
                 </div>
-
                 <div>
-                  <p className="text-xs text-slate-500">
-                    Email
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-300">
-                    your@email.com
-                  </p>
+                  <p className="text-xs text-slate-500">Email</p>
+                  <p className="mt-1 text-sm text-slate-300">ade.maulana@example.com</p>
                 </div>
               </a>
 
-              <div className="
-                flex items-center gap-4
-                rounded-xl
-                border border-white/10
-                bg-slate-900/50
-                p-4
-              ">
-                <div className="
-                  flex h-10 w-10
-                  items-center justify-center
-                  rounded-lg
-                  bg-cyan-400/10
-                  text-cyan-400
-                ">
-                  <MapPin size={18} />
+              <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-slate-900/50 p-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-400">
+                  <FaMapMarkerAlt size={18} />
                 </div>
-
                 <div>
-                  <p className="text-xs text-slate-500">
-                    Location
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-300">
-                    Indonesia
-                  </p>
+                  <p className="text-xs text-slate-500">Location</p>
+                  <p className="mt-1 text-sm text-slate-300">Indonesia</p>
                 </div>
               </div>
 
-            </div>
-
-            {/* Social */}
-            <div className="mt-8">
-              <p className="mb-3 text-xs text-slate-500">
-                FIND ME ONLINE
-              </p>
-
-              <div className="flex gap-2">
-
+              {SOCIALS.map(({ icon: Icon, label, value, href }) => (
                 <a
-                  href="https://github.com/"
+                  key={label}
+                  href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="GitHub"
-                  className="
-                    flex h-10 w-10
-                    items-center justify-center
-                    rounded-xl
-                    border border-white/10
-                    bg-white/5
-                    text-slate-400
-                    transition-colors
-                    hover:border-cyan-400/30
-                    hover:text-cyan-400
-                  "
+                  className="flex items-center gap-4 rounded-xl border border-white/10 bg-slate-900/50 p-4 transition-colors hover:border-cyan-400/30"
                 >
-                  <Code2 size={18} />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-400">
+                    <Icon size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">{label}</p>
+                    <p className="mt-1 text-sm text-slate-300">{value}</p>
+                  </div>
                 </a>
-
-                <a
-                  href="https://linkedin.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                  className="
-                    flex h-10 w-10
-                    items-center justify-center
-                    rounded-xl
-                    border border-white/10
-                    bg-white/5
-                    text-slate-400
-                    transition-colors
-                    hover:border-cyan-400/30
-                    hover:text-cyan-400
-                  "
-                >
-                  <BriefcaseBusiness size={18} />
-                </a>
-
-              </div>
+              ))}
             </div>
           </section>
 
           {/* Form */}
-          <section className="
-            rounded-2xl
-            border border-white/10
-            bg-slate-900/50
-            p-5 md:p-6
-          ">
-            <h2 className="text-lg font-semibold text-white">
-              Send a Message
-            </h2>
-
-            <p className="
-              mt-1
-              text-xs text-slate-500
-            ">
+          <section className="rounded-2xl border border-white/10 bg-slate-900/50 p-5 md:p-6">
+            <h2 className="text-lg font-semibold text-white">Send a Message</h2>
+            <p className="mt-1 text-xs text-slate-500">
               Saya akan membalas pesan secepat mungkin.
             </p>
 
-            <form
-              onSubmit={handleSubmit}
-              className="mt-6 space-y-4"
-            >
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              {FIELDS.map(({ name, label, type, placeholder }) => (
+                <div key={name}>
+                  <label htmlFor={name} className="mb-2 block text-xs font-medium text-slate-300">
+                    {label}
+                  </label>
+                  <input
+                    id={name}
+                    name={name}
+                    type={type}
+                    required
+                    value={form[name as keyof typeof form]}
+                    onChange={handleChange}
+                    placeholder={placeholder}
+                    className={inputClass}
+                  />
+                </div>
+              ))}
 
-              {/* Name */}
               <div>
-                <label
-                  htmlFor="name"
-                  className="
-                    mb-2 block
-                    text-xs font-medium
-                    text-slate-300
-                  "
-                >
-                  Name
-                </label>
-
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Your name"
-                  className="
-                    w-full rounded-xl
-                    border border-white/10
-                    bg-slate-950/60
-                    px-4 py-3
-                    text-sm text-white
-                    outline-none
-                    placeholder:text-slate-600
-                    focus:border-cyan-400/50
-                  "
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="
-                    mb-2 block
-                    text-xs font-medium
-                    text-slate-300
-                  "
-                >
-                  Email
-                </label>
-
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="you@example.com"
-                  className="
-                    w-full rounded-xl
-                    border border-white/10
-                    bg-slate-950/60
-                    px-4 py-3
-                    text-sm text-white
-                    outline-none
-                    placeholder:text-slate-600
-                    focus:border-cyan-400/50
-                  "
-                />
-              </div>
-
-              {/* Subject */}
-              <div>
-                <label
-                  htmlFor="subject"
-                  className="
-                    mb-2 block
-                    text-xs font-medium
-                    text-slate-300
-                  "
-                >
-                  Subject
-                </label>
-
-                <input
-                  id="subject"
-                  name="subject"
-                  type="text"
-                  required
-                  value={form.subject}
-                  onChange={handleChange}
-                  placeholder="Project discussion"
-                  className="
-                    w-full rounded-xl
-                    border border-white/10
-                    bg-slate-950/60
-                    px-4 py-3
-                    text-sm text-white
-                    outline-none
-                    placeholder:text-slate-600
-                    focus:border-cyan-400/50
-                  "
-                />
-              </div>
-
-              {/* Message */}
-              <div>
-                <label
-                  htmlFor="message"
-                  className="
-                    mb-2 block
-                    text-xs font-medium
-                    text-slate-300
-                  "
-                >
+                <label htmlFor="message" className="mb-2 block text-xs font-medium text-slate-300">
                   Message
                 </label>
-
                 <textarea
                   id="message"
                   name="message"
@@ -342,41 +141,17 @@ export default function ContactPage() {
                   value={form.message}
                   onChange={handleChange}
                   placeholder="Tell me about your project..."
-                  className="
-                    w-full resize-none
-                    rounded-xl
-                    border border-white/10
-                    bg-slate-950/60
-                    px-4 py-3
-                    text-sm text-white
-                    outline-none
-                    placeholder:text-slate-600
-                    focus:border-cyan-400/50
-                  "
+                  className={`resize-none ${inputClass}`}
                 />
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
-                className="
-                  flex w-full
-                  items-center justify-center
-                  gap-2
-                  rounded-xl
-                  bg-cyan-400
-                  px-4 py-3
-                  text-sm font-semibold
-                  text-slate-950
-                  transition-all
-                  hover:bg-cyan-300
-                  active:scale-[0.98]
-                "
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition-all hover:bg-cyan-300 active:scale-[0.98]"
               >
-                <Send size={16} />
+                <FaPaperPlane size={16} />
                 Send Message
               </button>
-
             </form>
           </section>
         </div>

@@ -33,7 +33,7 @@ const projects = [
 
 export default function FeaturedProjects() {
   return (
-    <section className="px-6 py-12 md:px-10 lg:px-14">
+    <section className="px-3 py-4 md:px-3 lg:px-4">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-[10px] font-medium tracking-[0.3em] text-cyan-400">

@@ -7,7 +7,8 @@ import WhatICanDo from "@/components/sections/WhatICanDo";
 import HowIWork from "@/components/sections/HowIWork";
 import HomeContact from "@/components/sections/HomeContact";
 import HeroCarousel from "@/components/sections/HeroCarousel";
-
+import Footer from "@/components/layout/Footer";
+import Contoact from "@/app/contact/page";
 
 export default function Home() {
   return (
@@ -79,9 +80,8 @@ export default function Home() {
         <Experience />
         <WhatICanDo />
         <HowIWork />
-        <HomeContact />
+        <Contoact />
       </div>
-
     </div>
   );
 }

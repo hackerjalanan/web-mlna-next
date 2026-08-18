@@ -135,7 +135,7 @@ export default function HeroCarousel() {
         {/* Content */}
         <div
             key={slide.id}
-            className="mx-auto flex min-h-[390px] max-w-[1440px] items-center px-6 py-10 md:px-10 lg:px-14"
+            className="mx-auto flex min-h-[390px] max-w-[1440px] items-center px-3 py-10 md:px-10 lg:px-14"
         >
             <div className="w-full max-w-3xl animate-[fadeIn_.5s_ease-out]">
             {/* Label */}

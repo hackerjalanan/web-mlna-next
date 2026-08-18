@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 import FireworkButton from "@/components/sections/FireworkButton";
 import { useLoading } from "@/context/LoadingContext";
+import Footer from "@/components/layout/Footer";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(true);
@@ -39,8 +40,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             children
           )}
         </div>
+          <Footer />
       </main>
-
       <FireworkButton />
     </>
   );

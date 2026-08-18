@@ -38,7 +38,7 @@ const capabilities = [
 
 export default function WhatICanDo() {
   return (
-    <section className="px-6 py-12 md:px-10 lg:px-14">
+    <section className="px-3 py-10 md:px-3 lg:px-4">
       <div className="mb-6">
         <p className="text-[10px] font-medium tracking-[0.3em] text-cyan-400">
           EXPERTISE
