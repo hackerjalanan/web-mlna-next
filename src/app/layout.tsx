@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ade-maulana.my.id'),
-  title: "Ade Maulana Hidayah",
+  title: "Ade Maulana Hidayah | Fullstack Developer",
   description: "Personal portfolio of Ade Maulana Hidayah",
   icons: {
     icon: [
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     shortcut: ['/favicon.ico'],
   },
   openGraph: {
-    title: "Ade Maulana Hidayah",
+    title: "Ade Maulana Hidayah | Fullstack Developer",
     description: "Personal portfolio of Ade Maulana Hidayah",
     url: "https://ade-maulana.my.id",   
     siteName: "Ade Maulana Hidayah",
