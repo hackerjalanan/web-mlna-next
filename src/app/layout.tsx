@@ -6,7 +6,7 @@
     title: "Ade Maulana Hidayah",
     description: "Personal portfolio of Ade Maulana Hidayah",
     icons: {
-      icon: "/icon.svg",
+      icon: "/icon.png",
     },
   };
 
