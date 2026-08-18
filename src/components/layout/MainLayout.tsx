@@ -23,25 +23,28 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           ${open ? "md:ml-60" : "md:ml-20"}
         `}
       >
+        {!isPending &&
         <div className="mx-auto max-w-[1440px]">
           <Breadcrumb />
-        </div>
-
+        </div>}
         {/* Wrapper konten — loading cuma nutup ini */}
         <div className="relative min-h-[70vh]">
           {isPending ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/90">
-              <div className="relative flex h-16 w-16 items-center justify-center">
-                <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-cyan-400 border-r-sky-500" />
-                <span className="text-lg font-bold text-cyan-400">ADM</span>
+            <div className="absolute inset-0 flex items-center justify-center  h-[100vh] bg-slate-950/90">
+              <div className="flex flex-col items-center gap-3">
+                <div className="relative flex h-16 w-16 items-center justify-center">
+                  <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-cyan-400 border-r-sky-500" />
+                  <span className="text-lg font-bold text-cyan-400">ADM</span>
+                </div>
+                <span className="text-sm font-medium text-slate-400">Loading...</span>
               </div>
             </div>
           ) : (
             children
           )}
         </div>
-          <Footer />
-      </main>
+        {!isPending && <Footer />}
+      </main> 
       <FireworkButton />
     </>
   );

@@ -111,7 +111,7 @@ export default function Projects() {
             FILTER
         ====================================================== */}
 
-        <div className="sticky top-10 z-[100] flex flex-col gap-2 overflow-visible rounded-lg border border-slate-700/50 bg-slate-950/95 p-4 backdrop-blur-md min-[920px]:flex-row min-[920px]:items-center min-[920px]:justify-between">
+        <div className=" z-[100] flex flex-col gap-2 overflow-visible  border border-slate-700/50 bg-slate-950/95 p-4 backdrop-blur-md min-[920px]:flex-row min-[920px]:items-center min-[920px]:justify-between">
           {/* CATEGORY */}
 
           <div className="flex w-full flex-wrap items-center justify-between gap-2">

@@ -1,5 +1,6 @@
 import MainLayout from "@/components/layout/MainLayout";
 import BotGate from "@/components/BotGate";
+import { LoadingProvider } from "@/context/LoadingContext";
 
 export default function SiteLayout({
   children,
@@ -8,7 +9,9 @@ export default function SiteLayout({
 }>) {
   return (
     <BotGate>
-      <MainLayout>{children}</MainLayout>
+      <LoadingProvider>
+        <MainLayout>{children}</MainLayout>
+      </LoadingProvider>
     </BotGate>
   );
 }

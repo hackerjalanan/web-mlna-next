@@ -7,6 +7,7 @@ import {
   type SetStateAction,
 } from "react";
 
+import { useLoading } from "@/context/LoadingContext";
 import { menuItems } from "./MenuItems";
 
 interface NavbarProps {
@@ -16,6 +17,7 @@ interface NavbarProps {
 
 export default function Navbar({ open, setOpen }: NavbarProps) {
   const [activeItem, setActiveItem] = useState("/");
+  const { navigate } = useLoading();
 
   // =====================================================
   // TABLET SIDEBAR BEHAVIOR
@@ -107,11 +109,15 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
   // =====================================================
   // HANDLE MENU CLICK
   // =====================================================
-  const handleMenuClick = (href: string) => {
+  const handleMenuClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
     setActiveItem(href);
 
-    // Kalau anchor section
+    // Kalau anchor section (mis. "#tentang")
     if (href.startsWith("#")) {
+      e.preventDefault();
       const sectionId = href.replace("#", "");
       const section = document.getElementById(sectionId);
 
@@ -121,7 +127,14 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
           block: "start",
         });
       }
+      return;
     }
+
+    // Route biasa (mis. "/admin", "/projects")
+    // Cegah full page reload, pakai client-side navigation
+    // supaya Navbar & MainLayout tidak ikut unmount
+    e.preventDefault();
+    navigate(href);
   };
 
   // =====================================================
@@ -194,10 +207,10 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
               key={item.name}
               href={item.href}
               title={item.name}
-              onClick={() => handleMenuClick(item.href)}
-              className={`flex items-center rounded-lg px-3 py-3 transition-all duration-200 ${
-                getActiveClass(item.href)
-              } ${open ? "gap-3" : "justify-center"}`}
+              onClick={(e) => handleMenuClick(e, item.href)}
+              className={`flex items-center rounded-lg px-3 py-3 transition-all duration-200 ${getActiveClass(
+                item.href
+              )} ${open ? "gap-3" : "justify-center"}`}
             >
               {/* ICON */}
               <span className="flex h-6 w-6 shrink-0 items-center justify-center">
@@ -219,18 +232,14 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
           MOBILE HEADER
       ====================================================== */}
 
-<div className="fixed left-0 top-0 z-40 flex h-11 w-full items-center justify-center border-b border-white/10 bg-slate-900/95 backdrop-blur-xl md:hidden">
-  <div
-    className={`logo-gradient ${
-      open ? "h-12 w-11" : "h-12 w-11"
-    }`}
-    aria-label="MlnA Logo"
-  />
+      <div className="left-0 top-0 z-40 flex h-11 w-full items-center justify-center border-b border-white/10 bg-slate-900/95 backdrop-blur-xl md:hidden">
+        <div
+          className={`logo-gradient ${open ? "h-12 w-11" : "h-12 w-11"}`}
+          aria-label="MlnA Logo"
+        />
 
-  <h1 className="ml-[2px] text-base font-bold text-white">
-    MlnA
-  </h1>
-</div>
+        <h1 className="ml-[2px] text-base font-bold text-white">MlnA</h1>
+      </div>
 
       {/* =====================================================
           MOBILE BOTTOM NAVIGATION
@@ -256,7 +265,7 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
             key={item.name}
             href={item.href}
             title={item.name}
-            onClick={() => handleMenuClick(item.href)}
+            onClick={(e) => handleMenuClick(e, item.href)}
             className={`
               flex flex-col
               items-center justify-center
@@ -270,9 +279,7 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
               {item.icon}
             </span>
 
-            <span className="text-[10px] font-medium">
-              {item.name}
-            </span>
+            <span className="text-[10px] font-medium">{item.name}</span>
           </a>
         ))}
       </nav>

@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 
 import type { GalleryCategory } from "@/data/gallery";
-import type { SortOrder } from "@/app/gallery/types";
+import type { SortOrder } from "@/app/(site)/gallery/types";
 
 const categories: ("All" | GalleryCategory)[] = [
   "All",
