@@ -58,8 +58,8 @@ export default function Gallery() {
   }, [search, category, sortOrder]);
 
   return (
-    <section className="min-h-screen px-2 md:px-4">
-      <div className="mx-auto max-w-[1440px]">
+    <section className="min-h-screen">
+      <div className="mx-auto px-6 max-w-[1440px]  md:px-4">
         {/* Header */}
         <div className="mb-8">
           <p className="mb-2 text-sm text-cyan-400">MY COLLECTION</p>
