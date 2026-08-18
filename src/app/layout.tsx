@@ -3,8 +3,8 @@
   import "./globals.css";
 
   export const metadata: Metadata = {
-    title: "Ade Maulana",
-    description: "Personal portfolio of Ade Maulana",
+    title: "Ade Maulana Hidayah",
+    description: "Personal portfolio of Ade Maulana Hidayah",
     icons: {
       icon: "/logo-am.svg",
     },

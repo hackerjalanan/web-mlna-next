@@ -9,7 +9,7 @@ export default function Loading() {
         </div>
 
         <p className="mt-4 text-xs tracking-[0.3em] text-slate-500">
-          LOADING
+          LOADING..
         </p>
       </div>
     </div>
