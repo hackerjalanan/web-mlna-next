@@ -10,7 +10,7 @@ export default function Hero() {
           </p>
 
           <h1 className="text-5xl font-bold leading-tight sm:text-6xl lg:text-7xl">
-            Ade Maulana
+            Ade Maulana Hidayah
           </h1>
 
           <h2 className="mt-4 text-2xl font-semibold text-slate-300 sm:text-3xl">
