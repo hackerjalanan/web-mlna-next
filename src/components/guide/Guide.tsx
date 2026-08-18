@@ -57,8 +57,8 @@ export default function Guide() {
   }, [search, category]);
 
   return (
-    <section className="min-h-screen px-2 py-2 md:px-4">
-      <div className="mx-auto max-w-6xl">
+    <section className="min-h-screen py-2 ">
+      <div className="mx-auto px-4 max-w-[1440px] md:px-4">
 
         {/* Header */}
         <div className="mb-8">

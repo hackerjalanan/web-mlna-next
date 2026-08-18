@@ -68,8 +68,8 @@ const experiences = [
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen px-4 py-0 md:px-4 py-4">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-screen py-0 ">
+      <div className="mx-auto px-4 max-w-[1440px] md:px-4 py-4">
 
         {/* Header */}
         <section className="mb-12 max-w-3xl">
