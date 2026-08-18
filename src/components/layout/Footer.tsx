@@ -8,7 +8,7 @@ import {
 export default function Footer() {
   return (
     <footer className="mt-8   border-t border-white/10 px-2 py-4">
-      <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-4 text-sm text-slate-500 sm:flex-row sm:items-center">
+      <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 text-center text-sm text-slate-500 sm:flex-row sm:items-center sm:text-left">
         <p>© {new Date().getFullYear()} Ade Maulana Hidayah. All rights reserved.</p>
 
         <div className="flex items-center gap-4">
@@ -31,8 +31,8 @@ export default function Footer() {
           >
             <FaLinkedin className="h-5 w-5" />
           </a>
-
           <a
+          
             href="https://github.com/ademlna"
             target="_blank"
             rel="noopener noreferrer"
@@ -41,8 +41,8 @@ export default function Footer() {
           >
             <FaGithub className="h-5 w-5" />
           </a>
-
           <a
+          
             href="https://ade-maulana.my.id"
             target="_blank"
             rel="noopener noreferrer"
