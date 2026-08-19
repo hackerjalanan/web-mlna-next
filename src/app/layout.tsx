@@ -53,7 +53,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "/og-image.png",
+        url: "/favicon-192x192.png",
         width: 1200,
         height: 630,
         alt: "Ade Maulana Hidayah | Fullstack Developer",
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     title: "Ade Maulana Hidayah | Fullstack Developer",
     description:
       "Portfolio Ade Maulana Hidayah — Fullstack Developer yang berfokus pada pengembangan aplikasi web.",
-    images: ["/og-image.png"],
+    images: ["/favicon-192x192.png"],
   },
 
   robots: {

@@ -197,3 +197,13 @@ body {
     transform: translateX(0);
   }
 }
+
+
+.breadcrumb {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+

@@ -149,11 +149,11 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
         block w-full
         break-inside-avoid
         overflow-hidden
-        rounded-lg
+        rounded-none
         border border-white/10
         bg-slate-900
         text-left
-        outline-none
+        outline-none    
         transition-opacity
         duration-500
         ease-out
