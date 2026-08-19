@@ -361,7 +361,7 @@ function GalleryPreviewContent() {
     <div
       onContextMenu={(event) => event.preventDefault()}
       className="
-        sticky z-10
+        absolute z-10
         flex w-full flex-col
         bg-slate-950
          lg:inset-0 lg:z-10
