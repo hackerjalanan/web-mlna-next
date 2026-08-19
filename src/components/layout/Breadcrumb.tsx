@@ -18,7 +18,21 @@ export default function Breadcrumb() {
   }
 
   return (
-    <nav className="w-full">
+    <div
+      className="
+              fixed
+              top-0
+              z-50
+              h-12
+              w-full
+              shrink-0
+              border-b
+              border-white/10
+              bg-slate-950/95
+              backdrop-blur-md
+            "
+      >
+
       <div className="flex h-10 items-center gap-1.5 px-3 text-xs font-medium text-slate-200">
         {segments.map((segment, index) => {
           const href =
@@ -63,7 +77,8 @@ export default function Breadcrumb() {
           );
         })}
       </div>
-    </nav>
+    </div>
+ 
   );
 }
 

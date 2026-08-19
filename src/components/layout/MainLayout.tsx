@@ -32,24 +32,11 @@ export default function MainLayout({
         `}
       >
        {!isPending && (
-        <div
-          className="
-            fixed
-            top-0
-            z-50
-            h-12
-            w-full
-            shrink-0
-            border-b
-            border-white/10
-            bg-slate-950/95
-            backdrop-blur-md
-          "
-        >
+      
           <div className="mx-auto w-full max-w-[1440px]">
             <Breadcrumb />
           </div>
-        </div>
+     
       )}
 
         {/* CONTENT */}
