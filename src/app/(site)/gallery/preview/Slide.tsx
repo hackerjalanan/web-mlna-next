@@ -1,12 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
+
 import {
   TransformWrapper,
   TransformComponent,
   type ReactZoomPanPinchRef,
 } from "react-zoom-pan-pinch";
 
+  
 import type { GalleryItem } from "@/data/gallery";
 
 /* -------------------------------------------------------------------------- */
@@ -20,13 +22,13 @@ interface SlideProps {
 }
 
 /*
- * Mobile: card full width seperti feed IG.
- * - w-full, TANPA px/rounded → gambar full-bleed selebar layar.
- * - Tinggi TIDAK dipaksa (tidak ada h-[..vh] lagi), mengikuti tinggi
- *   natural gambar (lewat img h-auto), jadi rasio gambar apa adanya.
- *
- * Desktop (lg): tetap h-full penuh + snap, sesuai perilaku semula.
- */
+* Mobile: card full width seperti feed IG.
+* - w-full, TANPA px/rounded → gambar full-bleed selebar layar.
+* - Tinggi TIDAK dipaksa (tidak ada h-[..vh] lagi), mengikuti tinggi
+*   natural gambar (lewat img h-auto), jadi rasio gambar apa adanya.
+*
+* Desktop (lg): tetap h-full penuh + snap, sesuai perilaku semula.
+*/
 const slideWrapperClass = `
   relative
   flex w-full shrink-0
@@ -44,9 +46,9 @@ export function Slide({ slide, isTouchDevice, shouldLoad }: SlideProps) {
   const transformRef = useRef<ReactZoomPanPinchRef>(null);
 
   /*
-   * Kalau slide belum dekat dengan slide aktif,
-   * jangan render gambar sama sekali.
-   */
+  * Kalau slide belum dekat dengan slide aktif,
+  * jangan render gambar sama sekali.
+  */
   if (!shouldLoad) {
     return <div data-slide-image={slide.image} className={slideWrapperClass} />;
   }
@@ -107,32 +109,18 @@ export function Slide({ slide, isTouchDevice, shouldLoad }: SlideProps) {
         maxScale={5}
         centerOnInit
         centerZoomedOut
-        wheel={{
-          disabled: true,
-        }}
-        pinch={{
-          step: 5,
-          disabled: false,
-        }}
+        wheel={{ disabled: true }}
+        pinch={{ step: 5, disabled: false }}
         panning={{
-          /*
-           * Mobile:
-           * - belum zoom → swipe digunakan feed
-           * - sudah zoom → gambar boleh dipan
-           */
           disabled: isTouchDevice && !isZoomed,
           velocityDisabled: false,
         }}
-        doubleClick={{
-          disabled: true,
-        }}
+        doubleClick={{ disabled: true }}
         zoomAnimation={{
           animationTime: 200,
           animationType: "easeOut",
         }}
-        onTransformed={(_ref, state) => {
-          setIsZoomed(state.scale > 1.01);
-        }}
+     
       >
         <TransformComponent
           wrapperClass="!w-full !h-auto lg:!h-full lg:!w-full"

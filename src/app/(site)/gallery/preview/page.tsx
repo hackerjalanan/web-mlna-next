@@ -299,7 +299,7 @@ function GalleryPreviewContent() {
 
         if (!bestEntry) return;
 
-        const image = bestEntry.target.dataset.slideImage;
+        const image = (bestEntry.target as HTMLElement).dataset.slideImage;
 
         if (!image) return;
 
