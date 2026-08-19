@@ -42,7 +42,15 @@ function getDirection(
 
 function GalleryCard({ item, onSelect }: GalleryCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Gambar sudah selesai dimuat browser (event onLoad terpanggil)
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Dipakai untuk trigger transisi CSS di frame berikutnya
+  const [isRevealed, setIsRevealed] = useState(false);
+
+  // Kalau gambar gagal dimuat, jangan tampilkan card sama sekali
+  const [hasError, setHasError] = useState(false);
 
   // Arah saat overlay masuk
   const [enterDirection, setEnterDirection] =
@@ -51,6 +59,19 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
   // Arah saat overlay keluar
   const [exitDirection, setExitDirection] =
     useState<HoverDirection>("left");
+
+  const imageSrc = getThumbnailUrl(item.image, 400);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    // Tunggu satu frame supaya transisi opacity/translate ke-trigger dengan benar
+    const raf = requestAnimationFrame(() => {
+      setIsRevealed(true);
+    });
+
+    return () => cancelAnimationFrame(raf);
+  }, [isLoaded]);
 
   const handlePointerEnter = (
     e: React.PointerEvent<HTMLButtonElement>
@@ -110,13 +131,20 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
     }
   };
 
+  // Kalau URL tidak valid atau gambar gagal dimuat, tidak render apa pun.
+  if (hasError || !imageSrc) {
+    return null;
+  }
+
   return (
     <button
       type="button"
       onClick={() => onSelect(item)}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-      className="
+      onPointerEnter={isLoaded ? handlePointerEnter : undefined}
+      onPointerLeave={isLoaded ? handlePointerLeave : undefined}
+      tabIndex={isLoaded ? 0 : -1}
+      aria-hidden={!isLoaded}
+      className={`
         group relative mb-3
         block w-full
         break-inside-avoid
@@ -126,18 +154,21 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
         bg-slate-900
         text-left
         outline-none
+        transition-opacity
+        duration-500
+        ease-out
         focus:ring-2
         focus:ring-cyan-400/50
-      "
+        ${
+          isRevealed
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
+        }
+      `}
     >
       <div className="relative overflow-hidden">
-        {/* Skeleton placeholder, hilang begitu gambar selesai dimuat */}
-        {!isLoaded && (
-          <div className="absolute inset-0 min-h-40 animate-pulse bg-white/[0.04]" />
-        )}
-
         <Image
-          src={getThumbnailUrl(item.image, 400)}
+          src={imageSrc}
           alt={item.title}
           width={400}
           height={400}
@@ -148,20 +179,20 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
           "
           draggable={false}
           onLoad={() => setIsLoaded(true)}
-          className={`
+          onError={() => setHasError(true)}
+          className="
             h-auto
             w-full
             select-none
             object-cover
-            transition-[opacity,transform]
+            transition-transform
             duration-700
             ease-out
             will-change-transform
             group-hover:scale-105
             group-hover:duration-500
             group-hover:ease-[cubic-bezier(0.25,0.8,0.25,1)]
-            ${isLoaded ? "opacity-100" : "opacity-0"}
-          `}
+          "
         />
 
         {/* Overlay */}
@@ -173,7 +204,6 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
             transition-transform
             duration-500
             ease-out
-
             ${
               isHovered
                 ? "translate-x-0 translate-y-0"
@@ -206,7 +236,6 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
               ease-out
               sm:text-xl
               md:text-2xl
-
               ${
                 isHovered
                   ? "translate-x-0 translate-y-0 opacity-100"

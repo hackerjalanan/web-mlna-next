@@ -1,29 +1,149 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0d0d12",
+};
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ade-maulana.my.id'),
+  metadataBase: new URL("https://ade-maulana.my.id"),
+
   title: "Ade Maulana Hidayah | Fullstack Developer",
-  description: "Personal portfolio of Ade Maulana Hidayah",
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
-      { url: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    shortcut: ['/favicon.ico'],
-  },
+
+  description:
+    "Portfolio Ade Maulana Hidayah, Fullstack Developer yang berfokus pada pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, dan database.",
+
+  keywords: [
+    "Ade Maulana Hidayah",
+    "Fullstack Developer",
+    "Web Developer",
+    "Full Stack Developer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Next.js Developer",
+    "React.js Developer",
+    "Laravel Developer",
+    "Node.js Developer",
+    "JavaScript",
+    "TypeScript",
+    "PHP",
+    "MySQL",
+    "Web Developer Indonesia",
+    "Fullstack Developer Indonesia",
+  ],
+
+  authors: [
+    {
+      name: "Ade Maulana Hidayah",
+    },
+  ],
+
+  creator: "Ade Maulana Hidayah",
+
   openGraph: {
     title: "Ade Maulana Hidayah | Fullstack Developer",
-    description: "Personal portfolio of Ade Maulana Hidayah",
+    description:
+      "Portfolio Ade Maulana Hidayah — Fullstack Developer dengan pengalaman dalam pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, dan MySQL.",
     url: "https://ade-maulana.my.id",
     siteName: "Ade Maulana Hidayah",
     locale: "id_ID",
     type: "website",
+
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Ade Maulana Hidayah | Fullstack Developer",
+      },
+    ],
   },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Ade Maulana Hidayah | Fullstack Developer",
+    description:
+      "Portfolio Ade Maulana Hidayah — Fullstack Developer yang berfokus pada pengembangan aplikasi web.",
+    images: ["/og-image.png"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  icons: {
+    icon: [
+      {
+        url: "/favicon.ico",
+        sizes: "any",
+      },
+      {
+        url: "/favicon-48x48.png",
+        sizes: "48x48",
+        type: "image/png",
+      },
+      {
+        url: "/favicon-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+    ],
+
+    shortcut: "/favicon.ico",
+
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+      },
+    ],
+  },
+};
+
+/**
+ * Structured Data / JSON-LD
+ */
+const jsonLd = {
+  "@context": "https://ade-maulana.my.id",
+  "@type": "Person",
+
+  name: "Ade Maulana Hidayah",
+
+  jobTitle: "Fullstack Developer",
+
+  description:
+    "Fullstack Developer yang berfokus pada pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, JavaScript, dan MySQL.",
+
+  url: "https://ade-maulana.my.id",
+
+  sameAs: [
+    // Tambahkan URL sosial media kamu di sini
+    "https://github.com/ademlna",
+    "https://www.linkedin.com/ade-mlna",
+  ],
+
+  knowsAbout: [
+    "Full Stack Development",
+    "Web Development",
+    "Frontend Development",
+    "Backend Development",
+    "Laravel",
+    "PHP",
+    "Node.js",
+    "Express.js",
+    "React.js",
+    "Next.js",
+    "JavaScript",
+    "TypeScript",
+    "MySQL",
+    "PostgreSQL",
+    "REST API",
+    "Git",
+    "GitHub",
+  ],
 };
 
 export default function RootLayout({
@@ -32,8 +152,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <body>{children}</body>
+    <html
+      lang="id"
+      suppressHydrationWarning
+      className="h-full antialiased"
+    >
+      <head>
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd),
+          }}
+        />
+      </head>
+
+      <body className="min-h-full">
+        {children}
+      </body>
     </html>
   );
 }
