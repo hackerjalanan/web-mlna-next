@@ -14,9 +14,14 @@ export const metadata: Metadata = {
 
   description:
     "Portfolio Ade Maulana Hidayah, Fullstack Developer yang berfokus pada pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, dan database.",
-
+  verification: {
+    google: "xDHbp8yMfGPB_JcYTzwaKDMM7DhkSkfzmqycpRogdNQ",
+  },
   keywords: [
     "Ade Maulana Hidayah",
+    "Ade Maulana",
+    "AD.EM",
+    "ade_mlna",
     "Fullstack Developer",
     "Web Developer",
     "Full Stack Developer",
@@ -53,7 +58,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "/favicon-192x192.png",
+        url: "https://ade-maulana.my.id/favicon-192x192.png",
         width: 1200,
         height: 630,
         alt: "Ade Maulana Hidayah | Fullstack Developer",
@@ -77,26 +82,26 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicon.ico",
+        url: "https://ade-maulana.my.id/favicon.ico",
         sizes: "any",
       },
       {
-        url: "/favicon-48x48.png",
+        url: "https://ade-maulana.my.id/favicon-48x48.png",
         sizes: "48x48",
         type: "image/png",
       },
       {
-        url: "/favicon-192x192.png",
+        url: "https://ade-maulana.my.id/favicon-192x192.png",
         sizes: "192x192",
         type: "image/png",
       },
     ],
 
-    shortcut: "/favicon.ico",
+    shortcut: "https://ade-maulana.my.id/favicon.ico",
 
     apple: [
       {
-        url: "/apple-touch-icon.png",
+        url: "https://ade-maulana.my.id/apple-touch-icon.png",
         sizes: "180x180",
       },
     ],
@@ -123,6 +128,7 @@ const jsonLd = {
     // Tambahkan URL sosial media kamu di sini
     "https://github.com/ademlna",
     "https://www.linkedin.com/ade-mlna",
+    "https://www.instagram.com/ade_mlna",
   ],
 
   knowsAbout: [

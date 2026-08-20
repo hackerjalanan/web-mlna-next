@@ -9,6 +9,8 @@ import {
 
 import { useLoading } from "@/context/LoadingContext";
 import { menuItems } from "./MenuItems";
+import { cinzel } from "@/lib/fonts";
+
 
 interface NavbarProps {
   open: boolean;
@@ -165,7 +167,7 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
         <div className="group relative mb-10 flex h-10 items-center">
           {/* LOGO + TEXT */}
           <div
-            className={`flex h-10 items-center transition-all duration-300 ${
+            className={`flex h-10  items-center transition-all duration-300 ${
               open ? "ml-2 gap-2" : "w-full justify-center"
             }`}
           >
@@ -173,12 +175,14 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
               className={`logo-gradient ${
                 open ? "ml-8 h-10 w-12" : "h-10 w-14"
               }`}
-              aria-label="MlnA Logo"
+              aria-label="AD.EM Logo"
             />
 
             {open && (
-              <span className="whitespace-nowrap text-xl font-bold leading-none tracking-tight text-white">
-                MlnA
+             <span
+                className={`${cinzel.className} relative top-1 whitespace-nowrap text-2xl font-medium-bold leading-none tracking-[0.08em] text-white`}
+              >
+                AD<span className="text-cyan-400">.</span>EM
               </span>
             )}
           </div>
@@ -235,10 +239,10 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
       <div className="left-0 top-0 z-40 flex h-11 w-full items-center justify-center border-b border-white/10 bg-slate-900/95 backdrop-blur-xl md:hidden">
         <div
           className={`logo-gradient ${open ? "h-12 w-11" : "h-12 w-11"}`}
-          aria-label="MlnA Logo"
+          aria-label="AD.EM Logo"
         />
 
-        <h1 className="ml-[2px] text-base font-bold text-white">MlnA</h1>
+        <h1 className={`${cinzel.className} text-3xl font-medium-bold relative top-1 leading-none tracking-[0.08em] text-white`}> AD.EM</h1>
       </div>
 
       {/* =====================================================
