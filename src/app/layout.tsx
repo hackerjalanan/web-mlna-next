@@ -58,7 +58,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "https://ade-maulana.my.id/favicon-192x192.png",
+        url: "/favicon-192x192.png",
         width: 1200,
         height: 630,
         alt: "Ade Maulana Hidayah | Fullstack Developer",
@@ -82,26 +82,26 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "https://ade-maulana.my.id/favicon.ico",
+        url: "/favicon.ico",
         sizes: "any",
       },
       {
-        url: "https://ade-maulana.my.id/favicon-48x48.png",
+        url: "/favicon-48x48.png",
         sizes: "48x48",
         type: "image/png",
       },
       {
-        url: "https://ade-maulana.my.id/favicon-192x192.png",
+        url: "/favicon-192x192.png",
         sizes: "192x192",
         type: "image/png",
       },
     ],
 
-    shortcut: "https://ade-maulana.my.id/favicon.ico",
+    shortcut: "/favicon.ico",
 
     apple: [
       {
-        url: "https://ade-maulana.my.id/apple-touch-icon.png",
+        url: "/apple-touch-icon.png",
         sizes: "180x180",
       },
     ],
