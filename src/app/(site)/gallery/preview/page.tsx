@@ -1,9 +1,8 @@
-
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { X, ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 import { galleryItems, type GalleryItem } from "@/data/gallery";
 import { getThumbnailUrl } from "@/lib/GetThumbnailUrl";
@@ -13,28 +12,6 @@ import { Slide } from "./Slide";
 /* Touch device                                                               */
 /* -------------------------------------------------------------------------- */
 
-function useIsTouchDevice() {
-  const [isTouch, setIsTouch] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(pointer: coarse)");
-
-    const update = () => {
-      setIsTouch(mediaQuery.matches);
-    };
-
-    update();
-
-    mediaQuery.addEventListener("change", update);
-
-    return () => {
-      mediaQuery.removeEventListener("change", update);
-    };
-  }, []);
-
-  return isTouch;
-}
-
 /* -------------------------------------------------------------------------- */
 /* Desktop viewport (disamakan dengan breakpoint `lg` Tailwind = 1024px)      */
 /*                                                                            */
@@ -42,31 +19,16 @@ function useIsTouchDevice() {
 /* atau halaman biasa yang scroll bebas (mobile).                            */
 /* -------------------------------------------------------------------------- */
 
-function useIsDesktopViewport() {
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
-
-    const update = () => {
-      setIsDesktop(mediaQuery.matches);
-    };
-
-    update();
-
-    mediaQuery.addEventListener("change", update);
-
-    return () => {
-      mediaQuery.removeEventListener("change", update);
-    };
-  }, []);
-
-  return isDesktop;
-}
+import { useIsTouchDevice, useIsDesktopViewport } from "./hooks";
 
 /* -------------------------------------------------------------------------- */
 /* Gallery Preview                                                            */
 /* -------------------------------------------------------------------------- */
+
+const DESKTOP_LOAD_RADIUS = 2; // desktop: current ± 2 = 5 slide render sekaligus
+
+const MOBILE_BATCH_SIZE = 5; // mobile: tiap kali nambah window, +5 slide
+const MOBILE_EDGE_THRESHOLD = 1; // mulai nambah batch kalau currentIndex sudah sedekat ini dari ujung window
 
 function GalleryPreviewContent() {
   const router = useRouter();
@@ -80,6 +42,15 @@ function GalleryPreviewContent() {
   const feedRef = useRef<HTMLDivElement | null>(null);
 
   /*
+   * Index slide yang SEDANG jadi target scroll (misal habis klik thumbnail
+   * di sidebar desktop, ATAU initial open dari grid). Dipakai untuk
+   * mengoreksi ulang posisi scroll begitu gambar target selesai load
+   * (lihat onImageSettled di Slide) — karena di mobile tinggi slide
+   * berubah dari 0px -> tinggi asli setelah gambar selesai load.
+   */
+  const pendingScrollIndexRef = useRef<number | null>(null);
+
+  /*
    * Cari item awal berdasarkan URL.
    */
   const initialItem =
@@ -87,12 +58,20 @@ function GalleryPreviewContent() {
 
   /*
    * Semua foto dari kategori yang sama.
+   *
+   * di-useMemo supaya reference-nya stabil antar render (hanya berubah
+   * kalau initialItem/src benar-benar berubah) — dipakai sebagai dependency
+   * effect sync-scroll di bawah, jadi effect itu tidak re-run tiap render.
    */
-  const items = initialItem
-    ? galleryItems.filter(
-        (galleryItem) => galleryItem.category === initialItem.category
-      )
-    : [];
+  const items = useMemo(
+    () =>
+      initialItem
+        ? galleryItems.filter(
+            (galleryItem) => galleryItem.category === initialItem.category
+          )
+        : [],
+    [initialItem]
+  );
 
   const initialIndex = initialItem
     ? Math.max(
@@ -100,6 +79,31 @@ function GalleryPreviewContent() {
         items.findIndex((galleryItem) => galleryItem.image === initialItem.image)
       )
     : 0;
+
+  /*
+   * Window slide yang boleh render <img> di mobile.
+   *
+   * PENTING: window ini HANYA BOLEH MELEBAR, tidak pernah menyusut.
+   * Begitu currentIndex mendekati ujung window, ujung itu ditambah
+   * +MOBILE_BATCH_SIZE — ujung yang lain (yang sudah dilewati) TIDAK
+   * disentuh, jadi slide yang sudah pernah dimuat tidak akan pernah
+   * di-unmount / perlu dimuat ulang saat scroll lanjut ke arah yang sama.
+   *
+   * Di-init langsung center di sekitar initialIndex (gambar yang diklik
+   * dari grid), bukan dari 0 — supaya sejak render pertama window sudah
+   * pas, tidak perlu nunggu 1 render tambahan lewat effect recenter.
+   */
+  const [loadedRange, setLoadedRange] = useState(() => {
+    const half = Math.floor(MOBILE_BATCH_SIZE / 2);
+
+    return {
+      start: Math.max(0, initialIndex - half),
+      end: Math.min(
+        Math.max(items.length - 1, 0),
+        initialIndex + half
+      ),
+    };
+  });
 
   /*
    * Index aktif disimpan secara lokal.
@@ -110,16 +114,50 @@ function GalleryPreviewContent() {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
   /*
-   * Kalau URL berubah dari luar, sinkronkan index.
+   * Ref: index terakhir yang posisi scroll-nya sudah "dikonfirmasi" sesuai
+   * dengan `src` saat ini. `null` di awal supaya scroll pertama (initial
+   * mount / initial paint) tetap dijalankan.
+   *
+   * PENTING: effect di bawah ini menangani DUA kasus sekaligus —
+   * (1) initial open (misal dari grid, lewat URL ?src=...), dan
+   * (2) navigasi URL berikutnya yang datang dari LUAR komponen ini
+   *     (misal user klik gambar lain di grid di belakang overlay,
+   *     yang tidak lewat sidebar/goToIndex).
+   *
+   * Navigasi lewat sidebar/keyboard (goToIndex) TIDAK memicu effect ini,
+   * karena goToIndex mengubah URL lewat `window.history.replaceState`
+   * (bukan navigasi Next.js), jadi `useSearchParams()` / `src` di sini
+   * tidak berubah — goToIndex sudah scroll sendiri secara eksplisit.
+   *
+   * Sebelumnya, effect ini HANYA memanggil setCurrentIndex tanpa pernah
+   * memanggil scrollToIndex untuk kasus (2) — akibatnya index di state
+   * sudah benar, tapi posisi scroll di layar tetap di gambar lama. Ini
+   * yang bikin klik gambar X dari grid (satu-satunya cara navigasi di
+   * mobile, karena tidak ada sidebar) terlihat seperti "tetap nampilin
+   * gambar A".
    */
+  const syncedIndexRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (!src) return;
 
     const index = items.findIndex((galleryItem) => galleryItem.image === src);
 
-    if (index >= 0) {
-      setCurrentIndex(index);
-    }
+    if (index < 0) return;
+
+    if (syncedIndexRef.current === index) return;
+
+    const isFirstScroll = syncedIndexRef.current === null;
+
+    syncedIndexRef.current = index;
+
+    pendingScrollIndexRef.current = index;
+
+    setCurrentIndex(index);
+
+    requestAnimationFrame(() => {
+      scrollToIndex(index, isFirstScroll ? "auto" : "smooth");
+    });
   }, [src, items]);
 
   /*
@@ -187,6 +225,22 @@ function GalleryPreviewContent() {
 
     const target = items[index];
 
+    /*
+     * Tandai slide ini sebagai target scroll yang masih "pending".
+     * Kalau gambarnya belum ter-load saat scrollIntoView dipanggil
+     * (tinggi masih 0px), koreksi akan dilakukan lagi lewat
+     * onImageSettled begitu gambar benar-benar selesai load.
+     */
+    pendingScrollIndexRef.current = index;
+
+    /*
+     * Tandai juga di syncedIndexRef, supaya kalau suatu saat `src` ini
+     * benar-benar ter-sync lewat navigasi Next.js (bukan hanya
+     * replaceState), effect sync-scroll tidak scroll ulang secara
+     * tidak perlu ke posisi yang sudah benar.
+     */
+    syncedIndexRef.current = index;
+
     setCurrentIndex(index);
 
     updateUrl(target);
@@ -224,7 +278,9 @@ function GalleryPreviewContent() {
   /* Lock body scroll — HANYA di desktop.                                     */
   /*                                                                          */
   /* Di mobile preview jadi halaman biasa yang ikut scroll bareng page,       */
-  /* jadi body TIDAK boleh dikunci, supaya footer bisa dicapai.               */
+  /* jadi body TIDAK boleh dikunci, supaya footer bisa dicapai. Tidak ada     */
+  /* scroll-snap & tidak ada thumbnail bar di mobile — scroll bebas apa       */
+  /* adanya seperti halaman biasa.                                           */
   /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
@@ -238,6 +294,49 @@ function GalleryPreviewContent() {
       document.body.style.overflow = originalOverflow;
     };
   }, [isDesktop]);
+
+  /* ------------------------------------------------------------------------ */
+  /* Growing load-window untuk mobile.                                        */
+  /*                                                                          */
+  /* Window hanya melebar (+MOBILE_BATCH_SIZE) saat currentIndex mendekati    */
+  /* salah satu ujungnya. Ujung yang lain TIDAK disentuh — jadi slide yang    */
+  /* sudah dilewati tetap ter-mount, tidak perlu dimuat ulang.                */
+  /*                                                                          */
+  /* Kalau currentIndex melompat jauh di luar window (misal buka link foto    */
+  /* lain via URL / ganti src), window baru di-recenter di sekitar posisi    */
+  /* itu. (Recenter untuk initial index sudah ditangani lewat lazy init      */
+  /* state di atas, effect ini hanya menangani perpindahan setelahnya.)      */
+  /* ------------------------------------------------------------------------ */
+
+  useEffect(() => {
+    if (isDesktop) return;
+    if (items.length === 0) return;
+
+    setLoadedRange((prev) => {
+      if (currentIndex < prev.start || currentIndex > prev.end) {
+        const half = Math.floor(MOBILE_BATCH_SIZE / 2);
+
+        return {
+          start: Math.max(0, currentIndex - half),
+          end: Math.min(items.length - 1, currentIndex + half),
+        };
+      }
+
+      let { start, end } = prev;
+
+      if (currentIndex + MOBILE_EDGE_THRESHOLD >= end && end < items.length - 1) {
+        end = Math.min(items.length - 1, end + MOBILE_BATCH_SIZE);
+      }
+
+      if (currentIndex - MOBILE_EDGE_THRESHOLD <= start && start > 0) {
+        start = Math.max(0, start - MOBILE_BATCH_SIZE);
+      }
+
+      if (start === prev.start && end === prev.end) return prev;
+
+      return { start, end };
+    });
+  }, [currentIndex, items.length, isDesktop]);
 
   /* ------------------------------------------------------------------------ */
   /* Keyboard                                                                   */
@@ -341,18 +440,6 @@ function GalleryPreviewContent() {
     };
   }, [items, currentIndex, isDesktop]);
 
-  /* ------------------------------------------------------------------------ */
-  /* Initial scroll                                                             */
-  /* ------------------------------------------------------------------------ */
-
-  useEffect(() => {
-    if (!item) return;
-
-    requestAnimationFrame(() => {
-      scrollToIndex(currentIndex, "auto");
-    });
-  }, []);
-
   if (!item) {
     return null;
   }
@@ -361,110 +448,15 @@ function GalleryPreviewContent() {
     <div
       onContextMenu={(event) => event.preventDefault()}
       className="
-        absolute z-10
+        relative z-10
         flex w-full flex-col
         bg-slate-950
-         lg:inset-0 lg:z-10
+        lg:absolute lg:inset-0 lg:z-10
         lg:h-full lg:min-h-0
         lg:flex-row
         lg:overflow-hidden
       "
     >
-      {/* ------------------------------------------------------------------ */}
-      {/* CLOSE — fixed ke viewport, jadi tetap kelihatan walau di-scroll     */}
-      {/* ------------------------------------------------------------------ */}
-
-      {/* <button
-        type="button"
-        onClick={handleClose}
-        aria-label="Tutup preview"
-        className="
-          fixed
-          right-3
-          top-7
-          z-50
-          flex
-          h-10
-          w-10
-          items-center
-          justify-center
-          rounded-full
-          bg-black/60
-          text-white
-          backdrop-blur-md
-          transition
-          hover:bg-black/80
-          active:scale-95
-          sm:right-4
-          sm:top-4
-        "
-      >
-        <X size={18} />
-      </button> */}
-
-      {/* ------------------------------------------------------------------ */}
-      {/* MOBILE THUMBNAILS — sticky biar tetap kejangkau saat scroll bebas   */}
-      {/* ------------------------------------------------------------------ */}
-
-        <div
-            className="
-            sticky
-            top-11
-            order-1
-            z-30
-            flex
-            h-20
-            w-full
-            shrink-0
-            gap-2
-            overflow-x-auto
-            border-b
-            border-white/10
-            bg-slate-950/95
-            px-3
-            py-2
-            pr-16
-            backdrop-blur-md
-            lg:hidden
-            "
-            style={{
-            scrollbarWidth: "none",
-            }}
-        >
-            {items.map((thumb, index) => {
-            const isActive = index === currentIndex;
-
-            return (
-                <button
-                key={thumb.image}
-                type="button"
-                onClick={() => goTo(thumb)}
-                aria-label={`Buka ${thumb.title}`}
-                className={`
-                    relative
-                    h-16
-                    w-20
-                    shrink-0
-                    overflow-hidden
-                    rounded-md
-                    border
-                    transition
-                    ${isActive ? "border-cyan-400 ring-1 ring-cyan-400/50" : "border-white/10"}
-                `}
-                >
-                <img
-                    src={getThumbnailUrl(thumb.image, 160)}
-                    alt=""
-                    loading={Math.abs(index - currentIndex) <= 3 ? "eager" : "lazy"}
-                    decoding="async"
-                    draggable={false}
-                    className="h-full w-full object-cover"
-                />
-                </button>
-            );
-            })}
-        </div>
-
       {/* ------------------------------------------------------------------ */}
       {/* DESKTOP SIDEBAR                                                     */}
       {/* ------------------------------------------------------------------ */}
@@ -663,11 +655,19 @@ function GalleryPreviewContent() {
               key={slide.image}
               slide={slide}
               isTouchDevice={isTouchDevice}
-              /*
-               * Hanya current + 1 sebelumnya + 1 sesudahnya
-               * yang boleh load gambar.
-               */
-              shouldLoad={Math.abs(index - currentIndex) <= 1}
+              isDesktop={isDesktop}
+              shouldLoad={
+                isDesktop
+                  ? Math.abs(index - currentIndex) <= DESKTOP_LOAD_RADIUS
+                  : index >= loadedRange.start && index <= loadedRange.end
+              }
+              onImageSettled={() => {
+                if (pendingScrollIndexRef.current !== index) return;
+
+                pendingScrollIndexRef.current = null;
+
+                scrollToIndex(index, "auto");
+              }}
             />
           ))}
         </div>

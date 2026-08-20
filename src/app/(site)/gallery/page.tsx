@@ -16,7 +16,12 @@ export default function Gallery() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
 
   const openImage = (item: GalleryItem) => {
-    router.push(`/gallery/preview?src=${encodeURIComponent(item.image)}`);
+    const makeSlideId = (image: string) =>
+      "slide-" + image.replace(/[^a-z0-9-_]/gi, "-");
+
+    const id = makeSlideId(item.image);
+
+    router.push(`/gallery/preview?src=${encodeURIComponent(item.image)}#${id}`);
   };
 
   const resetFilters = () => {
