@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-import type { GalleryItem } from "@/types/gallery";
+import type { GalleryItem } from "@/data/gallery";
 
 /* -------------------------------------------------------------------------- */
 /* Slide                                                                       */

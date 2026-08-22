@@ -1,15 +1,22 @@
 "use client";
 
-
-
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
+import { galleryItems, type GalleryItem } from "@/data/gallery";
 import { getThumbnailUrl } from "@/lib/GetThumbnailUrl";
 import { Slide } from "./Slide";
-import type { GalleryItem } from "@/types/gallery";
-import { createClient } from "@/lib/supabase/client";
+/* -------------------------------------------------------------------------- */
+/* Touch device                                                               */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/* Desktop viewport (disamakan dengan breakpoint `lg` Tailwind = 1024px)      */
+/*                                                                            */
+/* Dipakai untuk memutuskan: apakah preview jadi overlay fullscreen (desktop) */
+/* atau halaman biasa yang scroll bebas (mobile).                            */
+/* -------------------------------------------------------------------------- */
 
 import { useIsTouchDevice, useIsDesktopViewport } from "./hooks";
 
@@ -34,50 +41,6 @@ function GalleryPreviewContent() {
   const feedRef = useRef<HTMLDivElement | null>(null);
 
   /*
-   * Semua item gallery, di-fetch dari Supabase.
-   *
-   * Sebelumnya ini adalah array statis (`galleryItems`) yang tersedia
-   * secara sinkron. Sekarang harus di-fetch dulu, jadi banyak derived
-   * value di bawah baru "benar" setelah `isLoadingItems` menjadi false.
-   */
-  const [allItems, setAllItems] = useState<GalleryItem[]>([]);
-  const [isLoadingItems, setIsLoadingItems] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadItems() {
-      setIsLoadingItems(true);
-      setLoadError(null);
-
-      const supabase = createClient();
-
-      const { data, error } = await supabase
-        .from("gallery_items")
-        .select("*")
-        .order("date", { ascending: false });
-
-      if (!active) return;
-
-      if (error) {
-        setLoadError(error.message);
-        setAllItems([]);
-      } else {
-        setAllItems((data as GalleryItem[]) ?? []);
-      }
-
-      setIsLoadingItems(false);
-    }
-
-    loadItems();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  /*
    * Index slide yang SEDANG jadi target scroll (misal habis klik thumbnail
    * di sidebar desktop, ATAU initial open dari grid). Dipakai untuk
    * mengoreksi ulang posisi scroll begitu gambar target selesai load
@@ -90,7 +53,7 @@ function GalleryPreviewContent() {
    * Cari item awal berdasarkan URL.
    */
   const initialItem =
-    allItems.find((galleryItem) => galleryItem.image === src) ?? null;
+    galleryItems.find((galleryItem) => galleryItem.image === src) ?? null;
 
   /*
    * Semua foto dari kategori yang sama.
@@ -102,11 +65,11 @@ function GalleryPreviewContent() {
   const items = useMemo(
     () =>
       initialItem
-        ? allItems.filter(
+        ? galleryItems.filter(
             (galleryItem) => galleryItem.category === initialItem.category
           )
         : [],
-    [initialItem, allItems]
+    [initialItem]
   );
 
   const initialIndex = initialItem
@@ -128,12 +91,6 @@ function GalleryPreviewContent() {
    * Di-init langsung center di sekitar initialIndex (gambar yang diklik
    * dari grid), bukan dari 0 — supaya sejak render pertama window sudah
    * pas, tidak perlu nunggu 1 render tambahan lewat effect recenter.
-   *
-   * Catatan: pada render pertama (sebelum fetch selesai), `items` masih
-   * kosong, jadi window awal ini {0,0}. Begitu data selesai di-fetch,
-   * effect "growing load-window" di bawah akan otomatis recenter window
-   * ini ke initialIndex yang sebenarnya (lihat useEffect [currentIndex,
-   * items.length, isDesktop]).
    */
   const [loadedRange, setLoadedRange] = useState(() => {
     const half = Math.floor(MOBILE_BATCH_SIZE / 2);
@@ -166,21 +123,22 @@ function GalleryPreviewContent() {
    *     (misal user klik gambar lain di grid di belakang overlay,
    *     yang tidak lewat sidebar/goToIndex).
    *
-   * Effect ini juga otomatis re-run begitu `items` berubah dari kosong
-   * (sebelum fetch) menjadi terisi (setelah fetch) — karena `items` ada
-   * di dependency array — sehingga currentIndex & posisi scroll baru
-   * benar-benar dikoreksi setelah data dari Supabase tersedia.
-   *
    * Navigasi lewat sidebar/keyboard (goToIndex) TIDAK memicu effect ini,
    * karena goToIndex mengubah URL lewat `window.history.replaceState`
    * (bukan navigasi Next.js), jadi `useSearchParams()` / `src` di sini
    * tidak berubah — goToIndex sudah scroll sendiri secara eksplisit.
+   *
+   * Sebelumnya, effect ini HANYA memanggil setCurrentIndex tanpa pernah
+   * memanggil scrollToIndex untuk kasus (2) — akibatnya index di state
+   * sudah benar, tapi posisi scroll di layar tetap di gambar lama. Ini
+   * yang bikin klik gambar X dari grid (satu-satunya cara navigasi di
+   * mobile, karena tidak ada sidebar) terlihat seperti "tetap nampilin
+   * gambar A".
    */
   const syncedIndexRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!src) return;
-    if (items.length === 0) return;
 
     const index = items.findIndex((galleryItem) => galleryItem.image === src);
 
@@ -212,19 +170,13 @@ function GalleryPreviewContent() {
 
   /* ------------------------------------------------------------------------ */
   /* Invalid src                                                               */
-  /*                                                                            */
-  /* PENTING: tunggu sampai fetch selesai (isLoadingItems === false) sebelum   */
-  /* memutuskan src "tidak valid". Kalau tidak, effect ini akan SELALU         */
-  /* redirect ke /gallery pada render pertama — karena allItems masih kosong  */
-  /* (belum sempat di-fetch), jadi initialItem selalu null di awal.           */
   /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
-    if (isLoadingItems) return;
     if (src && !initialItem) {
       router.replace("/gallery");
     }
-  }, [src, initialItem, router, isLoadingItems]);
+  }, [src, initialItem, router]);
 
   /* ------------------------------------------------------------------------ */
   /* Update URL tanpa navigasi Next.js                                        */
@@ -350,9 +302,9 @@ function GalleryPreviewContent() {
   /* sudah dilewati tetap ter-mount, tidak perlu dimuat ulang.                */
   /*                                                                          */
   /* Kalau currentIndex melompat jauh di luar window (misal buka link foto    */
-  /* lain via URL / ganti src, ATAU saat data pertama kali selesai di-fetch  */
-  /* dan currentIndex ter-set ke initialIndex yang sebenarnya), window baru   */
-  /* di-recenter di sekitar posisi itu.                                      */
+  /* lain via URL / ganti src), window baru di-recenter di sekitar posisi    */
+  /* itu. (Recenter untuk initial index sudah ditangani lewat lazy init      */
+  /* state di atas, effect ini hanya menangani perpindahan setelahnya.)      */
   /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
@@ -486,26 +438,6 @@ function GalleryPreviewContent() {
       observer.disconnect();
     };
   }, [items, currentIndex, isDesktop]);
-
-  /* ------------------------------------------------------------------------ */
-  /* Loading / error state                                                     */
-  /* ------------------------------------------------------------------------ */
-
-  if (isLoadingItems) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-slate-950">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/10 border-t-cyan-400" />
-      </div>
-    );
-  }
-
-  if (loadError) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-sm text-red-400">
-        Gagal memuat gallery: {loadError}
-      </div>
-    );
-  }
 
   if (!item) {
     return null;

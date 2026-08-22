@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -9,20 +8,14 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/admin/login");
+    redirect("/login");
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 p-8 text-white">
-      <h1 className="text-3xl font-bold">
-        Admin Dashboard
-      </h1>
+    <section>
+      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
-      <p className="mt-2 text-slate-400">
-        Login sebagai: {user.email}
-      </p>
-    </main>
-
-    
+      <p className="mt-2 text-slate-400">Login sebagai: {user.email}</p>
+    </section>
   );
 }
