@@ -14,7 +14,7 @@ const slides = [
     title: "Ade Maulana Hidayah",
     subtitle: "Fullstack Developer",
     description:
-      "Saya membangun aplikasi web modern dengan fokus pada performa, pengalaman pengguna, dan solusi yang dapat diandalkan.",
+      "Kita membangun aplikasi web modern dengan fokus pada performa, pengalaman pengguna, dan solusi yang dapat diandalkan.",
     primary: "View Projects",
     primaryHref: "/projects",
     secondary: "Contact Me",
