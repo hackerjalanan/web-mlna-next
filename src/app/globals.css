@@ -58,8 +58,8 @@ body {
 
   background-size: 100% 300%;
 
-  -webkit-mask-image: url("/public/favicon.png");
-  mask-image: url("/public/favicon.svg");
+  -webkit-mask-image: url("/image/logo-am.svg");
+  mask-image: url("/image/logo-am.svg");
 
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;

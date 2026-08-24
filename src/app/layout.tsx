@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import "./globals.css";
 import Script from "next/script";
+import "./globals.css";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -11,13 +11,18 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://ade-maulana.my.id"),
 
-  title: "Ade Maulana Hidayah | Fullstack Developer",
+  title: {
+    default: "Ade Maulana Hidayah | Fullstack Developer",
+    template: "%s | Ade Maulana Hidayah",
+  },
 
   description:
     "Portfolio Ade Maulana Hidayah, Fullstack Developer yang berfokus pada pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, dan database.",
+
   verification: {
     google: "xDHbp8yMfGPB_JcYTzwaKDMM7DhkSkfzmqycpRogdNQ",
   },
+
   keywords: [
     "Ade Maulana Hidayah",
     "Ade Maulana",
@@ -43,77 +48,114 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "Ade Maulana Hidayah",
+      url: "https://ade-maulana.my.id",
     },
   ],
 
   creator: "Ade Maulana Hidayah",
 
-  openGraph: {
-    title: "Ade Maulana Hidayah | Fullstack Developer",
-    description:
-      "Portfolio Ade Maulana Hidayah — Fullstack Developer dengan pengalaman dalam pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, dan MySQL.",
-    url: "https://ade-maulana.my.id",
-    siteName: "Ade Maulana Hidayah",
-    locale: "id_ID",
-    type: "website",
+  publisher: "Ade Maulana Hidayah",
 
-    images: [
-      {
-        url: "/favicon-192x192.png",
-        width: 1200,
-        height: 630,
-        alt: "Ade Maulana Hidayah | Fullstack Developer",
-      },
-    ],
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: "Ade Maulana Hidayah | Fullstack Developer",
-    description:
-      "Portfolio Ade Maulana Hidayah — Fullstack Developer yang berfokus pada pengembangan aplikasi web.",
-    images: ["/favicon-192x192.png"],
+  alternates: {
+    canonical: "https://ade-maulana.my.id",
   },
 
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "https://ade-maulana.my.id",
+    siteName: "Ade Maulana Hidayah",
+
+    title: "Ade Maulana Hidayah | Fullstack Developer",
+
+    description:
+      "Portfolio Ade Maulana Hidayah — Fullstack Developer dengan pengalaman dalam pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, dan MySQL.",
+
+    /*
+     * Jangan menggunakan favicon 192x192
+     * sebagai gambar OG 1200x630.
+     *
+     * Jika nanti kamu memiliki gambar OG 1200x630,
+     * tambahkan:
+     *
+     * images: [
+     *   {
+     *     url: "/og-image.png",
+     *     width: 1200,
+     *     height: 630,
+     *     alt: "Ade Maulana Hidayah | Fullstack Developer",
+     *   },
+     * ],
+     */
+  },
+
+  twitter: {
+    card: "summary",
+
+    title: "Ade Maulana Hidayah | Fullstack Developer",
+
+    description:
+      "Portfolio Ade Maulana Hidayah — Fullstack Developer yang berfokus pada pengembangan aplikasi web.",
   },
 
   icons: {
     icon: [
       {
         url: "/favicon.ico",
-        sizes: "any",
       },
       {
-        url: "/favicon-48x48.png",
-        sizes: "48x48",
+        url: "/favicon-16x16.png",
+        sizes: "16x16",
         type: "image/png",
       },
       {
-        url: "/favicon-192x192.png",
+        url: "/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/android-chrome-192x192.png",
         sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/android-chrome-512x512.png",
+        sizes: "512x512",
         type: "image/png",
       },
     ],
 
-    shortcut: "/favicon.ico",
+    shortcut: ["/favicon.ico"],
 
     apple: [
       {
         url: "/apple-touch-icon.png",
         sizes: "180x180",
+        type: "image/png",
       },
     ],
   },
+
+  manifest: "/site.webmanifest",
 };
 
 /**
- * Structured Data / JSON-LD
+ * JSON-LD Structured Data
  */
 const jsonLd = {
-  "@context": "https://ade-maulana.my.id",
+  "@context": "https://schema.org",
   "@type": "Person",
 
   name: "Ade Maulana Hidayah",
@@ -126,9 +168,8 @@ const jsonLd = {
   url: "https://ade-maulana.my.id",
 
   sameAs: [
-    // Tambahkan URL sosial media kamu di sini
     "https://github.com/ademlna",
-    "https://www.linkedin.com/ade-mlna",
+    "https://www.linkedin.com/in/ade-mlna",
     "https://www.instagram.com/ade_mlna",
   ],
 
@@ -168,15 +209,10 @@ export default function RootLayout({
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
-          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(jsonLd),
           }}
         />
-      </head>
-
-      <body className="min-h-full">
-        {children}
 
         {/* Google Analytics */}
         <Script
@@ -187,11 +223,20 @@ export default function RootLayout({
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
-            function gtag(){window.dataLayer.push(arguments);}
+
+            function gtag() {
+              window.dataLayer.push(arguments);
+            }
+
             gtag('js', new Date());
+
             gtag('config', 'G-BRS4WS2VSQ');
           `}
         </Script>
+      </head>
+
+      <body className="min-h-full">
+        {children}
       </body>
     </html>
   );

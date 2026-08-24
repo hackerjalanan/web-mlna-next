@@ -25,7 +25,7 @@ const FIELDS = [
 ];
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/50";
+  "w-full rounded-sm border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/50";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
@@ -62,9 +62,9 @@ export default function ContactPage() {
             <div className="space-y-3">
               <a
                 href="mailto:ade.maulana@example.com"
-                className="flex items-center gap-4 rounded-xl border border-white/10 bg-slate-900/50 p-4 transition-colors hover:border-cyan-400/30"
+                className="flex items-center gap-4 rounded-sm border border-white/10 bg-slate-900/50 p-4 transition-colors hover:border-cyan-400/30"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-400">
+                <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-cyan-400/10 text-cyan-400">
                   <FaEnvelope size={18} />
                 </div>
                 <div>
@@ -73,8 +73,8 @@ export default function ContactPage() {
                 </div>
               </a>
 
-              <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-slate-900/50 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-400">
+              <div className="flex items-center gap-4 rounded-sm border border-white/10 bg-slate-900/50 p-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-cyan-400/10 text-cyan-400">
                   <FaMapMarkerAlt size={18} />
                 </div>
                 <div>
@@ -89,9 +89,9 @@ export default function ContactPage() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 rounded-xl border border-white/10 bg-slate-900/50 p-4 transition-colors hover:border-cyan-400/30"
+                  className="flex items-center gap-4 rounded-sm border border-white/10 bg-slate-900/50 p-4 transition-colors hover:border-cyan-400/30"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-400">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-cyan-400/10 text-cyan-400">
                     <Icon size={18} />
                   </div>
                   <div>
@@ -104,7 +104,7 @@ export default function ContactPage() {
           </section>
 
           {/* Form */}
-          <section className="rounded-2xl border border-white/10 bg-slate-900/50 p-5 md:p-6">
+          <section className="rounded-sm  border border-white/10 bg-slate-900/50 p-5 md:p-6">
             <h2 className="text-lg font-semibold text-white">Send a Message</h2>
             <p className="mt-1 text-xs text-slate-500">
               Saya akan membalas pesan secepat mungkin.
@@ -147,7 +147,7 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition-all hover:bg-cyan-300 active:scale-[0.98]"
+                className="flex w-full items-center justify-center gap-2 rounded-sm bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition-all hover:bg-cyan-300 active:scale-[0.98]"
               >
                 <FaPaperPlane size={16} />
                 Send Message
