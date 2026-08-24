@@ -67,6 +67,7 @@ export default function Home() {
           blur-3xl
         " />
       </div>
+      
       <div className="mx-auto max-w-[1440px]">
         <HeroCarousel />
         <QuickProfile />

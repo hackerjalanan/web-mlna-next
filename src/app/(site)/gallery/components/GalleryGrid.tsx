@@ -146,7 +146,7 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
       tabIndex={isLoaded ? 0 : -1}
       aria-hidden={!isLoaded}
       className={`
-        group relative mb-3
+        group relative mb-7
         block w-full
         break-inside-avoid
         overflow-hidden
@@ -369,7 +369,7 @@ export default function GalleryGrid({ items, onSelect }: GalleryGridProps) {
 
   return (
     <>
-      <div className="columns-3 gap-2 sm:columns-3 md:columns-4">
+      <div className="columns-3 gap-7 sm:columns-3 md:columns-4">
         {visibleItems.map((item) => (
           <GalleryCard key={item.image} item={item} onSelect={onSelect} />
         ))}

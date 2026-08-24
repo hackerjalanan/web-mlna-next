@@ -13,7 +13,7 @@ const skillGroups = [
       "JavaScript",
       "TypeScript",
       "React.js",
-      "Next.js",
+      "Next.js", "Flutter", "dart",
       "Tailwind CSS",
     ],
   },

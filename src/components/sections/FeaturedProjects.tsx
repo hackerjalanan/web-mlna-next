@@ -4,28 +4,49 @@ import {
   ExternalLink,
 } from "lucide-react";
 
+const truncate = (text: string, maxLength: number = 46) => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + "...";
+};
+
 const projects = [
   {
-    title: "Training Dashboard",
+    title: "Training Report",
     description:
-      "Dashboard untuk monitoring dan pelaporan training secara real-time.",
+      "Sistem untuk monitoring dan pelaporan training.",
     stack: ["React.js", "Node.js", "MySQL"],
-    github: "#",
-    demo: "#",
-  },
-  {
-    title: "Babinsa Messenger",
-    description:
-      "Aplikasi komunikasi berbasis web dengan REST API untuk kebutuhan komunikasi.",
-    stack: ["Node.js", "Express.js", "MySQL"],
-    github: "#",
-    demo: "#",
+    github: "https://github.com/ademlna/training-report-gii.git",
+    demo: "https://fe-trainer-ade-legends-projects.vercel.app/",
   },
   {
     title: "Personal Portfolio",
     description:
       "Portfolio personal dengan Next.js dan Tailwind CSS untuk menampilkan profile dan project.",
     stack: ["Next.js", "TypeScript", "Tailwind"],
+    github: "https://github.com/ademlna/personal-portofolio.git",
+    demo: "https://ade-maulana.my.id/",
+  },
+  {
+    title: "Mobile-Authentication-App",
+    description:
+      "Aplikasi autentikasi mobile dengan React Native dan Firebase.",
+    stack: ["Dart", "Flutter", "Mysql"],
+    github: "https://github.com/ademlna/Mobile-Authentication-App",
+    demo: "https://ade-maulana.my.id/",
+  },
+  {
+    title: "BE-Authentication-App",
+    description:
+      "Aplikasi autentikasi mobile dengan React Native dan Firebase.",
+    stack: ["PHP", "Laravel", "Mysql"],
+    github: "https://github.com/ademlna/Mobile-Authentication-App",
+    demo: "https://ade-maulana.my.id/",
+  },
+  {
+    title: "Babinsa Messenger",
+    description:
+      "Aplikasi komunikasi berbasis web dengan REST API untuk kebutuhan komunikasi.",
+    stack: ["Node.js", "Express.js", "MySQL"],
     github: "#",
     demo: "#",
   },
@@ -64,97 +85,100 @@ export default function FeaturedProjects() {
         </a>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
-        {projects.map((project, index) => (
-          <article
-            key={project.title}
+     <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
+    {projects.map((project, index) => (
+      <article
+        key={project.title}
+        className="
+          group
+          min-w-[280px]
+          shrink-0
+          snap-start
+          rounded-lg
+          border border-white/10
+          bg-slate-900/40
+          p-5
+          transition-all
+          hover:-translate-y-1
+          hover:border-cyan-400/20
+        "
+      >
+        <div className="mb-5 flex items-center justify-between">
+          <span className="text-[10px] text-slate-600">
+            0{index + 1}
+          </span>
+
+          <ArrowUpRight
+            size={16}
             className="
-              group
-              rounded-xl
-              border border-white/10
-              bg-slate-900/40
-              p-5
-              transition-all
-              hover:-translate-y-1
-              hover:border-cyan-400/20
+              text-slate-600
+              transition-colors
+              group-hover:text-cyan-400
+            "
+          />
+        </div>
+
+        <h3 className="text-sm font-semibold text-slate-200">
+          {project.title}
+        </h3>
+
+        <p className="
+          mt-2
+          min-h-[48px]
+          text-xs
+          leading-6
+          text-slate-500
+        ">
+          {truncate(project.description)}
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {project.stack.map((tech) => (
+            <span
+              key={tech}
+              className="
+                rounded-md
+                bg-cyan-400/5
+                px-2 py-1
+                text-[9px]
+                text-cyan-400/80
+              "
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-5 flex gap-3 border-t border-white/5 pt-4">
+          <a
+            href={project.github}
+            className="
+              flex items-center gap-1
+              text-[10px]
+              text-slate-500
+              hover:text-slate-300
             "
           >
-            <div className="mb-5 flex items-center justify-between">
-              <span className="text-[10px] text-slate-600">
-                0{index + 1}
-              </span>
-
-              <ArrowUpRight
-                size={16}
-                className="
-                  text-slate-600
-                  transition-colors
-                  group-hover:text-cyan-400
-                "
-              />
-            </div>
-
-            <h3 className="text-sm font-semibold text-slate-200">
-              {project.title}
-            </h3>
-
-            <p className="
-              mt-2
-              min-h-[48px]
-              text-xs
-              leading-6
+            <Code2 size={13} />
+            GitHub
+          </a>
+          
+          <a
+            href={project.demo}
+            className="
+              flex items-center gap-1
+              text-[10px]
               text-slate-500
-            ">
-              {project.description}
-            </p>
-
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {project.stack.map((tech) => (
-                <span
-                  key={tech}
-                  className="
-                    rounded-md
-                    bg-cyan-400/5
-                    px-2 py-1
-                    text-[9px]
-                    text-cyan-400/80
-                  "
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-5 flex gap-3 border-t border-white/5 pt-4">
-              <a
-                href={project.github}
-                className="
-                  flex items-center gap-1
-                  text-[10px]
-                  text-slate-500
-                  hover:text-slate-300
-                "
-              >
-                <Code2 size={13} />
-                GitHub
-              </a>
-
-              <a
-                href={project.demo}
-                className="
-                  flex items-center gap-1
-                  text-[10px]
-                  text-slate-500
-                  hover:text-cyan-400
-                "
-              >
-                <ExternalLink size={13} />
-                Demo
-              </a>
-            </div>
-          </article>
-        ))}
-      </div>
+              hover:text-cyan-400
+            "
+          >
+            <ExternalLink size={13} />
+            Demo
+          </a>
+        </div>
+      </article>
+    ))}
+    </div>
 
       <a
         href="/projects"

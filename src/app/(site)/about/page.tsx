@@ -6,20 +6,142 @@ import {
   GitBranch,
   BriefcaseBusiness,
 } from "lucide-react";
+import {
+  SiJavascript,
+  SiTypescript,
+  SiReact,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiExpress,
+  SiPhp,
+  SiLaravel,
+  SiMysql,
+  SiPostgresql,
+  SiTailwindcss,
+  SiGit,
+  SiPython,
+  SiFlask,
+  SiDart,
+  SiFlutter,
+  SiDocker,
+  SiVite,
+  SiWebpack,
+  SiRedux,
+  SiPostman,
+  SiFigma,
+} from "react-icons/si";
 
 const skills = [
-  "JavaScript",
-  "TypeScript",
-  "React.js",
-  "Next.js",
-  "Node.js",
-  "Express.js",
-  "PHP",
-  "Laravel",
-  "MySQL",
-  "PostgreSQL",
-  "Tailwind CSS",
-  "Git",
+  {
+    name: "JavaScript",
+    icon: SiJavascript,
+    color: "#F7DF1E",
+  },
+  {
+    name: "TypeScript",
+    icon: SiTypescript,
+    color: "#3178C6",
+  },
+  {
+    name: "React.js",
+    icon: SiReact,
+    color: "#61DAFB",
+  },
+  {
+    name: "Next.js",
+    icon: SiNextdotjs,
+    color: "#FFFFFF",
+  },
+  {
+    name: "Node.js",
+    icon: SiNodedotjs,
+    color: "#339933",
+  },
+  {
+    name: "Express.js",
+    icon: SiExpress,
+    color: "#FFFFFF",
+  },
+  {
+    name: "PHP",
+    icon: SiPhp,
+    color: "#777BB4",
+  },
+  {
+    name: "Laravel",
+    icon: SiLaravel,
+    color: "#FF2D20",
+  },
+  {
+    name: "MySQL",
+    icon: SiMysql,
+    color: "#4479A1",
+  },
+  {
+    name: "PostgreSQL",
+    icon: SiPostgresql,
+    color: "#4169E1",
+  },
+  {
+    name: "Tailwind CSS",
+    icon: SiTailwindcss,
+    color: "#06B6D4",
+  },
+  {
+    name: "Git",
+    icon: SiGit,
+    color: "#F05032",
+  },
+  {
+    name: "Python",
+    icon: SiPython,
+    color: "#3776AB",
+  },
+  {
+    name: "Flask",
+    icon: SiFlask,
+    color: "#FFFFFF",
+  },
+  {
+    name: "Dart",
+    icon: SiDart,
+    color: "#0175C2",
+  },
+  {
+    name: "Flutter",
+    icon: SiFlutter,
+    color: "#02569B",
+  },
+  {
+    name: "Docker",
+    icon: SiDocker,
+    color: "#2496ED",
+  },
+  {
+    name: "Vite",
+    icon: SiVite,
+    color: "#646CFF",
+  },
+  {
+    name: "Webpack",
+    icon: SiWebpack,
+    color: "#8DD6F9",
+  },
+  {
+    name: "Redux",
+    icon: SiRedux,
+    color: "#764ABC",
+  },
+  {
+    name: "Postman",
+    icon: SiPostman,
+    color: "#FF6C37",
+  },
+  {
+    name: "Figma",
+    icon: SiFigma,
+    color: "#F24E1E",
+  },
 ];
 
 const services = [
@@ -120,7 +242,7 @@ export default function AboutPage() {
 
           {/* Quick Info */}
           <div className="
-            rounded-2xl
+            rounded-lg
             border border-white/10
             bg-slate-900/60
             p-6
@@ -189,7 +311,7 @@ export default function AboutPage() {
                 <div
                   key={service.title}
                   className="
-                    rounded-2xl
+                    rounded-lg
                     border border-white/10
                     bg-slate-900/50
                     p-5
@@ -200,8 +322,7 @@ export default function AboutPage() {
                   <div className="
                     mb-4 flex h-10 w-10
                     items-center justify-center
-                    rounded-xl
-                    bg-cyan-400/10
+                    rounded-lg                    bg-cyan-400/10
                     text-cyan-400
                   ">
                     <Icon size={20} />
@@ -236,22 +357,39 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {skills.map((skill) => (
-              <span
-                key={skill}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3">
+        
+          {skills.map((skill) => {
+            const Icon = skill.icon;
+            
+            return (
+              <div
+                key={skill.name}
                 className="
-                  rounded-lg
+                  h-20
+                 
                   border border-white/10
                   bg-white/5
-                  px-3 py-2
-                  text-xs text-slate-300
+                  px-10
+                  transition
+                  hover:border-white/20
+                  hover:bg-white/10
                 "
               >
-                {skill}
-              </span>
-            ))}
-          </div>
+                <div className="flex h-full items-center gap-3">
+                  <Icon
+                    className="shrink-0 text-3xl"
+                    style={{ color: skill.color }}
+                  />
+
+                  <span className="text-sm font-medium text-slate-200">
+                    {skill.name}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
         </section>
 
         {/* Experience */}
@@ -271,7 +409,7 @@ export default function AboutPage() {
               <div
                 key={`${experience.role}-${experience.company}`}
                 className="
-                  rounded-2xl
+                  rounded-lg
                   border border-white/10
                   bg-slate-900/50
                   p-5
@@ -282,8 +420,7 @@ export default function AboutPage() {
                     hidden h-10 w-10
                     shrink-0
                     items-center justify-center
-                    rounded-xl
-                    bg-white/5
+                    rounded-lg                    bg-white/5
                     text-cyan-400
                     sm:flex
                   ">
