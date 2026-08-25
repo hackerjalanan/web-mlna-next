@@ -58,8 +58,8 @@ body {
 
   background-size: 100% 300%;
 
-  -webkit-mask-image: url("/image/logo-am.svg");
-  mask-image: url("/image/logo-am.svg");
+  -webkit-mask-image: url("/public/image/logo-am.svg");
+  mask-image: url("/public/image/logo-am.svg");
 
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
@@ -207,3 +207,72 @@ body {
   z-index: 1000;
 }
 
+/* loading */
+.loading-logo {
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-logo svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Isi logo naik perlahan */
+.loading-fill {
+  animation: logoLoading 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Kilauan bergerak ketika loading */
+.loading-shine {
+  animation: shine 3s ease-in-out infinite;
+}
+
+/* Dari kosong -> penuh -> kosong */
+@keyframes logoLoading {
+  0% {
+    transform: translateY(180px);
+  }
+
+  10% {
+    transform: translateY(180px);
+  }
+
+  85% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Shine bergerak dari bawah ke atas */
+@keyframes shine {
+  0% {
+    transform: translateY(135px);
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 0;
+  }
+
+  60% {
+    opacity: 0.8;
+  }
+
+  85% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+}

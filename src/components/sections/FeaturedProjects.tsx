@@ -3,54 +3,12 @@ import {
   Code2,
   ExternalLink,
 } from "lucide-react";
+import { projects } from "@/data/projects";
 
 const truncate = (text: string, maxLength: number = 46) => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength).trim() + "...";
 };
-
-const projects = [
-  {
-    title: "Training Report",
-    description:
-      "Sistem untuk monitoring dan pelaporan training.",
-    stack: ["React.js", "Node.js", "MySQL"],
-    github: "https://github.com/ademlna/training-report-gii.git",
-    demo: "https://fe-trainer-ade-legends-projects.vercel.app/",
-  },
-  {
-    title: "Personal Portfolio",
-    description:
-      "Portfolio personal dengan Next.js dan Tailwind CSS untuk menampilkan profile dan project.",
-    stack: ["Next.js", "TypeScript", "Tailwind"],
-    github: "https://github.com/ademlna/personal-portofolio.git",
-    demo: "https://ade-maulana.my.id/",
-  },
-  {
-    title: "Mobile-Authentication-App",
-    description:
-      "Aplikasi autentikasi mobile dengan React Native dan Firebase.",
-    stack: ["Dart", "Flutter", "Mysql"],
-    github: "https://github.com/ademlna/Mobile-Authentication-App",
-    demo: "https://ade-maulana.my.id/",
-  },
-  {
-    title: "BE-Authentication-App",
-    description:
-      "Aplikasi autentikasi mobile dengan React Native dan Firebase.",
-    stack: ["PHP", "Laravel", "Mysql"],
-    github: "https://github.com/ademlna/Mobile-Authentication-App",
-    demo: "https://ade-maulana.my.id/",
-  },
-  {
-    title: "Babinsa Messenger",
-    description:
-      "Aplikasi komunikasi berbasis web dengan REST API untuk kebutuhan komunikasi.",
-    stack: ["Node.js", "Express.js", "MySQL"],
-    github: "#",
-    demo: "#",
-  },
-];
 
 export default function FeaturedProjects() {
   return (
@@ -84,7 +42,6 @@ export default function FeaturedProjects() {
           View all →
         </a>
       </div>
-
       <div
         className="
           flex
@@ -105,28 +62,30 @@ export default function FeaturedProjects() {
               group
               min-w-0
               shrink-0
-              basis-[calc((100%-0.75rem)/2)]
+              basis-[calc((100%-1.5rem)/3)]
               snap-start
+
               rounded-lg
               border border-white/10
               bg-slate-900/40
-              p-5
+
+              p-3
+
               transition-all
               hover:-translate-y-1
               hover:border-cyan-400/20
 
-              sm:basis-[calc((100%-0.75rem)/2)]
-
               lg:basis-[calc((100%-1.5rem)/3)]
             "
           >
-            <div className="mb-5 flex items-center justify-between">
-              <span className="text-[10px] text-slate-600">
+            {/* Header */}
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-[8px] text-slate-600">
                 0{index + 1}
               </span>
 
               <ArrowUpRight
-                size={16}
+                size={13}
                 className="
                   text-slate-600
                   transition-colors
@@ -135,67 +94,96 @@ export default function FeaturedProjects() {
               />
             </div>
 
-            <h3 className="text-sm font-semibold text-slate-200">
+            {/* Title */}
+            <h3
+              className="
+                line-clamp-2
+                text-[11px]
+                font-semibold
+                leading-4
+                text-slate-200
+              "
+            >
               {project.title}
             </h3>
 
-            <p className="
-              mt-2
-              min-h-[48px]
-              text-xs
-              leading-6
-              text-slate-500
-            ">
+            {/* Description */}
+            <p
+              className="
+                mt-1.5
+                min-h-[40px]
+                line-clamp-3
+                text-[9px]
+                leading-4
+                text-slate-500
+              "
+            >
               {truncate(project.description)}
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {project.stack.map((tech) => (
+            {/* Stack */}
+            <div className="mt-3 flex flex-wrap gap-1">
+              {projects.map((project, index) => (
                 <span
-                  key={tech}
+                  key={project.slug}
                   className="
                     rounded-md
                     bg-cyan-400/5
-                    px-2 py-1
-                    text-[9px]
+                    px-1.5
+                    py-0.5
+                    text-[8px]
                     text-cyan-400/80
                   "
                 >
-                  {tech}
+                  {project.slug}
                 </span>
               ))}
             </div>
 
-            <div className="mt-5 flex gap-3 border-t border-white/5 pt-4">
+            {/* Links */}
+            <div
+              className="
+                mt-3
+                flex
+                gap-2
+                border-t
+                border-white/5
+                pt-3
+              "
+            >
               <a
-                href={project.github}
+                href={project.link}
                 className="
-                  flex items-center gap-1
-                  text-[10px]
+                  flex
+                  items-center
+                  gap-1
+                  text-[8px]
                   text-slate-500
                   hover:text-slate-300
                 "
               >
-                <Code2 size={13} />
+                <Code2 size={11} />
                 GitHub
               </a>
-              
+
               <a
-                href={project.demo}
+                href={project.link}
                 className="
-                  flex items-center gap-1
-                  text-[10px]
+                  flex
+                  items-center
+                  gap-1
+                  text-[8px]
                   text-slate-500
                   hover:text-cyan-400
                 "
               >
-                <ExternalLink size={13} />
+                <ExternalLink size={11} />
                 Demo
               </a>
             </div>
           </article>
         ))}
-        </div>
+      </div>
 
       <a
         href="/projects"

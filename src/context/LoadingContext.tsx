@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
+import Loading from "./Loading";
 
 interface LoadingContextType {
   isPending: boolean;
@@ -31,10 +32,8 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
     (href: string) => {
       setMinTimeReached(false);
 
-      // Bersihkan timer lama kalau ada klik menu beruntun
       if (timerRef.current) clearTimeout(timerRef.current);
 
-      // Paksa loading tampil minimal 400ms biar tidak flicker
       timerRef.current = setTimeout(() => setMinTimeReached(true), 400);
 
       startTransition(() => {
@@ -48,6 +47,7 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
 
   return (
     <LoadingContext.Provider value={{ isPending, navigate }}>
+      {isPending && <Loading />}
       {children}
     </LoadingContext.Provider>
   );

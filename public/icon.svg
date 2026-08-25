@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="206.74002mm"
+   height="206.74002mm"
+   viewBox="0 0 206.74002 206.74005"
+   version="1.1"
+   id="svg1"
+   xml:space="preserve"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs1"><linearGradient
+       id="linearGradient167"><stop
+         style="stop-color:#00a159;stop-opacity:1;"
+         offset="0"
+         id="stop168" /><stop
+         style="stop-color:#07d376;stop-opacity:1;"
+         offset="0.28770849"
+         id="stop169" /><stop
+         style="stop-color:#017ad9;stop-opacity:1;"
+         offset="0.6899142"
+         id="stop170" /><stop
+         style="stop-color:#3399ff;stop-opacity:1;"
+         offset="1"
+         id="stop167" /></linearGradient><linearGradient
+       xlink:href="#linearGradient167"
+       id="linearGradient1"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.778895,0,0,3.778895,178.64658,-111.35779)"
+       x1="-56.017334"
+       y1="88.788612"
+       x2="-44.904835"
+       y2="48.836533" /></defs><g
+     id="layer1"
+     transform="translate(89.711586,-35.436325)"
+     style="display:inline"><path
+       d="M 28.381657,48.415248 12.167571,85.151282 -4.7202089,48.721826 -12.99228,67.134768 l 0.0163,0.03322 -72.714383,161.828372 h 6.563355 10.158455 16.362499 16.723753 16.8136 16.7237688 0.064483 l 13.3102622,-29.96957 0.152308,-0.13482 1.80049,-4.00715 1.989902,4.427 13.460628,29.68448 h 16.600724 18.307494 16.86438 16.467925 6.682476 10.17996 L 36.980532,66.707101 l 0.0163,-0.03322 z M 28.826918,85.180576 90.090093,215.0436 H 73.622137 l -35.958825,-76.22943 0.01629,-0.0332 -8.61185,-18.25867 -16.214054,36.73605 -1.7966,-3.87631 -1.3220436,-2.9409 c -0.00645,0.0188 -0.00988,0.0379 -0.016295,0.0567 l -13.7554928,-29.66893 -8.2720706,18.41488 0.0163,0.0332 -34.045076,75.76662 H -62.700073 L -4.4852,85.487093 l 8.5161572,18.375837 -0.012962,0.0272 8.4907488,18.31333 8.152946,-18.4676 v -0.001 l -0.01289,-0.0252 z m 0.685424,72.107084 27.245447,57.75594 H 38.762724 l -17.514646,-38.97785 0.09948,-0.22262 v -0.001 l -0.01289,-0.0259 z m -33.3127971,0.3085 8.5161552,18.37387 -0.00982,0.0259 0.019433,0.0431 -17.5263421,39.00327 h -16.813488 z"
+       style="fill:url(#linearGradient1);fill-opacity:1;stroke-width:0"
+       id="path1" /></g></svg>

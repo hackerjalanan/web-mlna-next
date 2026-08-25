@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
+import { LoadingProvider } from "@/context/LoadingContext";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -236,7 +237,9 @@ export default function RootLayout({
       </head>
 
       <body className="min-h-full">
-        {children}
+        <LoadingProvider>
+          {children}
+        </LoadingProvider>
       </body>
     </html>
   );

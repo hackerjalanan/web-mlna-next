@@ -6,6 +6,7 @@ import Breadcrumb from "@/components/layout/Breadcrumb";
 import FireworkButton from "@/components/sections/FireworkButton";
 import { useLoading } from "@/context/LoadingContext";
 import Footer from "@/components/layout/Footer";
+import LogoSpinner from "@/context/Loading";
 
 export default function MainLayout({
   children,
@@ -31,26 +32,18 @@ export default function MainLayout({
           ${open ? "md:ml-60" : "md:ml-20"}
         `}
       >
-       {!isPending && (
-      
+        {!isPending && (
           <div className="mx-auto w-full max-w-[1440px]">
             <Breadcrumb />
           </div>
-     
-      )}
+        )}
 
         {/* CONTENT */}
         <div className="relative flex-1 min-h-0">
           {isPending ? (
-            <div className="absolute inset-0 z-10 flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-950/90 md:min-h-screen ">
+            <div className="absolute inset-0 z-10 flex min-h-[calc(100vh-4rem)] items-center justify-center bg-slate-950/90 md:min-h-screen">
               <div className="flex flex-col items-center gap-3">
-                <div className="relative flex h-16 w-16 items-center justify-center">
-                  <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-cyan-400 border-r-sky-500" />
-
-                  <span className="text-lg font-bold text-cyan-400">
-                    ADM
-                  </span>
-                </div>
+                <LogoSpinner size={64} />
 
                 <span className="text-sm font-medium text-slate-400">
                   Loading...
