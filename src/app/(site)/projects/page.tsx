@@ -309,7 +309,7 @@ function ProjectCard({
 
       {/* DETAIL */}
 
-      <Link
+      {/* <Link
         href={`/project/${project.slug}`}
         className="mt-5 inline-flex w-fit items-center gap-2 text-xs font-semibold text-sky-300 transition hover:text-sky-200"
       >
@@ -317,7 +317,7 @@ function ProjectCard({
         <span className="transition-transform group-hover:translate-x-1">
           →
         </span>
-      </Link>
+      </Link> */}
     </article>
   );
 }

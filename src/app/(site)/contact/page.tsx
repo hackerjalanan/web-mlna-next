@@ -9,9 +9,13 @@ import {
   FaInstagram,
   FaGlobe,
   FaPaperPlane,
+  FaSpinner,
 } from "react-icons/fa";
+import { toast } from "sonner";
+import type { ContactRequest } from "@/types/contact";
 
 const SOCIALS = [
+  { icon: FaEnvelope, label: "Email", value: "ademlna.dev@gmail.com", href: "mailto:ademlna.dev@gmail.com" },
   { icon: FaGithub, label: "GitHub", value: "ademlna", href: "https://github.com/ademlna" },
   { icon: FaLinkedin, label: "LinkedIn", value: "ade-mlna", href: "https://linkedin.com/in/ade-mlna" },
   { icon: FaInstagram, label: "Instagram", value: "ade_mlna", href: "https://instagram.com/ade_mlna" },
@@ -25,24 +29,66 @@ const FIELDS = [
 ];
 
 const inputClass =
-  "w-full rounded-sm border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/50";
+  "w-full rounded-sm border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/50 disabled:opacity-50";
+
+type SubmitStatus = "idle" | "loading" | "success" | "error";
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  code?: string;
+}
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState<ContactRequest>({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [status, setStatus] = useState<SubmitStatus>("idle");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(form);
-    // TODO: hubungkan ke API Route / Resend / Formspree
+
+    setStatus("loading");
+    const toastId = toast.loading("Mengirim pesan...");
+
+    try {
+      const res = await fetch("/api/v1/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data: ApiResponse = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Terjadi kesalahan");
+      }
+
+      toast.success(data.message || "Pesan berhasil dikirim", { id: toastId });
+
+      setStatus("success");
+      setForm({ name: "", email: "", subject: "", message: "" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Terjadi kesalahan", {
+        id: toastId,
+      });
+      setStatus("error");
+    }
   };
+
+  const isLoading = status === "loading";
 
   return (
     <main className="min-h-screen px-3 py-3  md:px-3">
-      <div className="mx-auto max-w-[1440px]">   
+      <div className="mx-auto max-w-[1440px]">
         <section className="mb-10 max-w-2xl">
           <p className="mb-3 text-sm text-cyan-400">CONTACT</p>
           <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
@@ -60,19 +106,6 @@ export default function ContactPage() {
             <h2 className="mb-5 text-lg font-semibold text-white">Contact Information</h2>
 
             <div className="space-y-3">
-              <a
-                href="mailto:ade.maulana@example.com"
-                className="flex items-center gap-4 rounded-sm border border-white/10 bg-slate-900/50 p-4 transition-colors hover:border-cyan-400/30"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-cyan-400/10 text-cyan-400">
-                  <FaEnvelope size={18} />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">Email</p>
-                  <p className="mt-1 text-sm text-slate-300">ade.maulana@example.com</p>
-                </div>
-              </a>
-
               <div className="flex items-center gap-4 rounded-sm border border-white/10 bg-slate-900/50 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-cyan-400/10 text-cyan-400">
                   <FaMapMarkerAlt size={18} />
@@ -121,6 +154,7 @@ export default function ContactPage() {
                     name={name}
                     type={type}
                     required
+                    disabled={isLoading}
                     value={form[name as keyof typeof form]}
                     onChange={handleChange}
                     placeholder={placeholder}
@@ -137,6 +171,7 @@ export default function ContactPage() {
                   id="message"
                   name="message"
                   required
+                  disabled={isLoading}
                   rows={6}
                   value={form.message}
                   onChange={handleChange}
@@ -147,10 +182,20 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-sm bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition-all hover:bg-cyan-300 active:scale-[0.98]"
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-sm bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition-all hover:bg-cyan-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <FaPaperPlane size={16} />
-                Send Message
+                {isLoading ? (
+                  <>
+                    <FaSpinner size={16} className="animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  <>
+                    <FaPaperPlane size={16} />
+                    Send Message
+                  </>
+                )}
               </button>
             </form>
           </section>

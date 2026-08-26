@@ -200,7 +200,7 @@ export default function AboutPage() {
           </p>
 
           <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
-            Mengenal saya lebih dekat.
+            Profil
           </h1>
 
           <p className="mt-5 text-sm leading-7 text-slate-400 md:text-base">
@@ -483,16 +483,15 @@ export default function AboutPage() {
               text-sm leading-7
               text-slate-400
             ">
-              <p>
-                Saya mengutamakan kode yang terstruktur,
-                mudah dipahami, dan dapat dikembangkan kembali.
+             <p>
+                Saya berfokus membangun aplikasi dengan struktur kode yang rapi,
+                efisien, dan mudah dikembangkan untuk kebutuhan jangka panjang.
               </p>
 
               <p>
-                Saya juga terbiasa melakukan debugging,
-                membaca dokumentasi, menggunakan Git,
-                serta mempelajari teknologi baru ketika
-                dibutuhkan oleh sebuah project.
+                Terbiasa melakukan analisis masalah, debugging, membaca dokumentasi,
+                menggunakan Git dalam workflow pengembangan, senang mengeksplorasi
+                teknologi baru untuk meningkatkan kualitas setiap project yang dikerjakan.
               </p>
             </div>
           </div>

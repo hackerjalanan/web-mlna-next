@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { LoadingProvider } from "@/context/LoadingContext";
+import { Toaster } from "sonner";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -82,15 +83,31 @@ export const metadata: Metadata = {
 
     description:
       "Portfolio Ade Maulana Hidayah — Fullstack Developer dengan pengalaman dalam pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, dan MySQL.",
+
+    // BARU: gambar preview saat link di-share (WA, Twitter, FB, LinkedIn, dll)
+    // Siapkan file /public/og-image.png ukuran 1200x630px
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Ade Maulana Hidayah - Fullstack Developer",
+      },
+    ],
   },
 
   twitter: {
-    card: "summary",
+    // "summary_large_image" menampilkan gambar full-width, lebih menarik
+    // daripada "summary" yang hanya thumbnail kecil
+    card: "summary_large_image",
 
     title: "Ade Maulana Hidayah | Fullstack Developer",
 
     description:
       "Portfolio Ade Maulana Hidayah — Fullstack Developer yang berfokus pada pengembangan aplikasi web.",
+
+    // BARU
+    images: ["/og-image.png"],
   },
 
   icons: {
@@ -138,6 +155,9 @@ const jsonLd = {
   "@type": "Person",
 
   name: "Ade Maulana Hidayah",
+
+  // BARU: foto/logo untuk Knowledge Panel saat orang mencari namamu di Google
+  image: "https://ade-maulana.my.id/og-image.png",
 
   jobTitle: "Fullstack Developer",
 
@@ -216,6 +236,27 @@ export default function RootLayout({
         <LoadingProvider>
           {children}
         </LoadingProvider>
+        <Toaster
+          position="top-right"
+          richColors={false}
+          toastOptions={{
+            classNames: {
+              toast:
+                "!bg-slate-950 !border !border-cyan-400/40 !shadow-[0_0_20px_rgba(34,211,238,0.35)]",
+              title: "!text-cyan-300 !font-semibold",
+              description: "!text-slate-300",
+              icon: "!text-cyan-400",
+              closeButton:
+                "!bg-slate-900 !border-cyan-400/30 !text-cyan-300 hover:!bg-slate-800",
+              success:
+                "!border-cyan-400/60 !shadow-[0_0_25px_rgba(34,211,238,0.5)]",
+              error:
+                "!border-red-400/50 !shadow-[0_0_20px_rgba(248,113,113,0.35)]",
+              loading:
+                "!border-cyan-400/40 !shadow-[0_0_15px_rgba(34,211,238,0.25)]",
+            },
+          }}
+        />
       </body>
     </html>
   );

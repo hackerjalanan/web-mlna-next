@@ -122,24 +122,6 @@ export default function FeaturedProjects() {
             </p>
 
             {/* Stack */}
-            <div className="mt-3 flex flex-wrap gap-1">
-              {projects.map((project, index) => (
-                <span
-                  key={project.slug}
-                  className="
-                    rounded-md
-                    bg-cyan-400/5
-                    px-1.5
-                    py-0.5
-                    text-[8px]
-                    text-cyan-400/80
-                  "
-                >
-                  {project.slug}
-                </span>
-              ))}
-            </div>
-
             {/* Links */}
             <div
               className="
