@@ -177,7 +177,7 @@ const experiences = [
     company: "PT. Gama Integra Informatika",
     period: "2024 — 2025",
     description:
-      "Mengembangkan dan melakukan maintenance aplikasi web, mengelola database, membangun fitur, melakukan troubleshooting, serta bekerja dengan teknologi frontend dan backend.",
+      "Mengembangkan dan melakukan maintenance aplikasi web, mengelola database, membangun fitur, melakukan troubleshooting, serta bekerja dengan backend.",
   },
   {
     role: "Freelance Developer & Designer",
@@ -199,9 +199,7 @@ export default function AboutPage() {
             ABOUT ME
           </p>
 
-          <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
-            Profil
-          </h1>
+         
 
           <p className="mt-5 text-sm leading-7 text-slate-400 md:text-base">
             Saya Ade Maulana Hidayah, seorang programmer dengan
