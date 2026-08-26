@@ -269,7 +269,7 @@ export default function FireworkButton() {
 
       timeoutsRef.current.push(greetingTimeout);
 
-      const response = await fetch("/api/fireworks", {
+      const response = await fetch("/api/v1/fireworks", {
         method: "POST",
         cache: "no-store",
       });
@@ -454,16 +454,52 @@ export default function FireworkButton() {
               disabled:cursor-wait
             "
           >
-            <span
-              className="
-                block text-2xl
-                animate-[spin_3s_linear_infinite]
-                transition-transform
-                group-hover:scale-110
-              "
-            >
-              🎆
-            </span>
+            <svg
+  className="
+    relative z-10
+    h-8 w-8
+    animate-[pulse_1.2s_ease-in-out_infinite]
+    drop-shadow-[0_0_10px_rgba(249,115,22,0.9)]
+    transition-transform
+    group-hover:scale-125
+  "
+  viewBox="0 0 64 64"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <linearGradient id="fireGradient" x1="32" y1="8" x2="32" y2="58">
+      <stop stopColor="#fde047" />
+      <stop offset="0.45" stopColor="#f97316" />
+      <stop offset="1" stopColor="#dc2626" />
+    </linearGradient>
+  </defs>
+
+  <path
+    className="animate-[pulse_0.8s_ease-in-out_infinite]"
+    d="
+      M32 4
+      C38 15 49 20 49 34
+      C49 47 41 56 32 56
+      C19 56 12 47 12 36
+      C12 25 22 19 27 9
+      C28 7 30 5 32 4Z
+    "
+    fill="url(#fireGradient)"
+  />
+
+  <path
+    d="
+      M32 22
+      C36 30 41 33 41 40
+      C41 47 37 51 32 51
+      C25 51 22 46 22 41
+      C22 35 27 31 32 22Z
+    "
+    fill="#fff7ed"
+    className="animate-[pulse_0.6s_ease-in-out_infinite]"
+  />
+</svg>
           </button>
         </div>
       </div>
