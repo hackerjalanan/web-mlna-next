@@ -96,7 +96,7 @@ export default function FireworkButton() {
   useEffect(() => {
     const getCount = async () => {
       try {
-        const response = await fetch("/api/fireworks", {
+        const response = await fetch("/api/v1/fireworks", {
           cache: "no-store",
         });
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,23 +18,33 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    const supabase = createClient();
+    try {
+      const response = await fetch("/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+      const result = await response.json();
 
-    if (error) {
-      setError("Email atau password salah.");
+      if (!response.ok) {
+        setError(result.message || "Email atau password salah.");
+        return;
+      }
+
+      router.push("/admin/dashboard");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      setError("Tidak dapat terhubung ke server.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setLoading(false);
-
-    router.push("/admin/dashboard");
-    router.refresh();
   };
 
   return (

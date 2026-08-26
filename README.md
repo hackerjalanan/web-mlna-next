@@ -34,8 +34,45 @@
      │    │    │      │           │
  Projects Gallery Docs          Admin
  Messages Fireworks
+# Foldering be
+src/
+├── app/
+│   └── api/
+│       └── v1/
+│           ├── auth/
+│           │   ├── login/
+│           │   │   └── route.ts
+│           │   ├── logout/
+│           │   │   └── route.ts
+│           │   └── me/
+│           │       └── route.ts
+│           │
+│           └── gallery/
+│               ├── route.ts
+│               └── [id]/
+│                   └── route.ts
+│
+├── lib/
+│   └── api/
+│       ├── error.ts       ← Exception
+│       ├── handler.ts     ← Global handler
+│       ├── http.ts        ← HTTP exceptions
+│       ├── request.ts     ← Request parser
+│       └── response.ts    ← JSON response
+│
+├── services/
+│   ├── auth.service.ts
+│   └── gallery.service.ts
+│
+├── validations/
+│   ├── auth.ts
+│   └── gallery.ts
+│
+└── types/
+    ├── auth.ts
+    └── gallery.ts
 
-# Foldering
+# Foldering fe
 portfolio/
 │
 ├── public/

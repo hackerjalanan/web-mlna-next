@@ -1,19 +1,14 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import type { GalleryItem, SortOrder } from "@/types/gallery";
+import type { GalleryCategory, GalleryItem, SortOrder } from "@/types/gallery";
 
 export interface GetGalleryItemsParams {
   search?: string;
-  category?: string;
+  category?: GalleryCategory;
   sortOrder?: SortOrder;
 }
 
-/**
- * Ambil data gallery dari Supabase.
- * Gambar sendiri tetap di-hosting di Google Drive — kolom `image`
- * di tabel `gallery_items` hanya menyimpan URL-nya.
- */
 export async function getGalleryItems(
   params: GetGalleryItemsParams = {}
 ): Promise<GalleryItem[]> {
@@ -23,12 +18,12 @@ export async function getGalleryItems(
 
   let query = supabase.from("gallery_items").select("*");
 
-  if (category && category !== "All") {
+  if (category) {
     query = query.eq("category", category);
   }
 
   if (search) {
-    const keyword = search.trim();
+    const keyword = search.trim().replace(/[%,]/g, "");
     query = query.or(
       `title.ilike.%${keyword}%,description.ilike.%${keyword}%`
     );
@@ -45,10 +40,6 @@ export async function getGalleryItems(
   return (data as GalleryItem[]) ?? [];
 }
 
-/**
- * Ambil satu item gallery berdasarkan id.
- * Berguna untuk halaman detail/preview.
- */
 export async function getGalleryItemById(
   id: number
 ): Promise<GalleryItem | null> {
@@ -61,7 +52,7 @@ export async function getGalleryItemById(
     .maybeSingle();
 
   if (error) {
-    throw new Error(`Gagal mengambil detail gallery: ${error.message}`);
+    throw new Error(`Gagal mengambil data gallery: ${error.message}`);
   }
 
   return (data as GalleryItem) ?? null;

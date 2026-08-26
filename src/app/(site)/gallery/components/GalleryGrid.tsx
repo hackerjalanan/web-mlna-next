@@ -146,7 +146,7 @@ function GalleryCard({ item, onSelect }: GalleryCardProps) {
       tabIndex={isLoaded ? 0 : -1}
       aria-hidden={!isLoaded}
       className={`
-        group relative mb-7
+        group relative mb-4
         block w-full
         break-inside-avoid
         overflow-hidden
@@ -359,17 +359,17 @@ export default function GalleryGrid({ items, onSelect }: GalleryGridProps) {
     );
   }
 
-  if (sourceItems.length === 0) {
-    return (
-      <div className="flex min-h-60 items-center justify-center rounded-2xl border border-dashed border-white/10 text-sm text-slate-500">
-        Tidak ada foto yang ditemukan.
-      </div>
-    );
-  }
+    if (!items || items.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <p className="text-sm text-slate-500">Belum ada foto untuk ditampilkan.</p>
+        </div>
+      );
+    }
 
   return (
     <>
-      <div className="columns-3 gap-7 sm:columns-3 md:columns-4">
+      <div className="columns-3 gap-4 sm:columns-3 md:columns-4">
         {visibleItems.map((item) => (
           <GalleryCard key={item.image} item={item} onSelect={onSelect} />
         ))}

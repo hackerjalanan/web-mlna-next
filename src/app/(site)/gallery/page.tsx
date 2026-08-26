@@ -3,13 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useGallery } from "@/hook/use_gallery.hook";
 import type { GalleryItem } from "@/types/gallery";
-
 import GalleryFilterBar from "./components/GalleryFilterBar";
 import GalleryGrid from "./components/GalleryGrid";
 
 export default function Gallery() {
   const router = useRouter();
-
   const {
     search,
     category,
@@ -24,28 +22,25 @@ export default function Gallery() {
     resetFilters,
   } = useGallery();
 
-  const openImage = (item: GalleryItem) => {
-    const makeSlideId = (image: string) =>
-      "slide-" + image.replace(/[^a-z0-9-_]/gi, "-");
+  const openPreview = (item: GalleryItem) => {
+    sessionStorage.setItem("gallery-preview-items", JSON.stringify(items));
 
-    const id = makeSlideId(item.image);
+    const params = new URLSearchParams({
+      id: String(item.id),
+    });
 
-    router.push(`/gallery/preview?src=${encodeURIComponent(item.image)}#${id}`);
+    router.push(`/gallery/preview?${params.toString()}`);
   };
 
   return (
     <div className="mb-0 p-3">
-
-      <div className="mb-0 ">
+      <div className="mb-0">
         <p className="mb-2 text-sm text-cyan-400">MY COLLECTION</p>
         <h1 className="text-3xl font-bold text-white md:text-4xl">Gallery</h1>
         <p className="mt-2 max-w-xl text-sm text-slate-400">
-          Kumpulan foto, desain, project, dan aktivitas yang pernah saya
-          kerjakan.
+          Kumpulan foto, desain, project, dan aktivitas yang pernah saya kerjakan.
         </p>
       </div>
-
- 
 
       <GalleryFilterBar
         search={search}
@@ -69,9 +64,7 @@ export default function Gallery() {
         <div className="text-sm text-red-400">Gagal memuat gallery: {error}</div>
       )}
 
-      {!loading && !error && (
-        <GalleryGrid items={items} onSelect={openImage} />
-      )}
+      {!loading && !error && <GalleryGrid items={items} onSelect={openPreview} />}
     </div>
   );
 }

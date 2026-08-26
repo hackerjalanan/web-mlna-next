@@ -10,7 +10,6 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import Loading from "./Loading";
 
 interface LoadingContextType {
   isPending: boolean;
@@ -22,19 +21,29 @@ const LoadingContext = createContext<LoadingContextType>({
   navigate: () => {},
 });
 
-export function LoadingProvider({ children }: { children: ReactNode }) {
+export function LoadingProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const router = useRouter();
+
   const [isTransitioning, startTransition] = useTransition();
   const [minTimeReached, setMinTimeReached] = useState(true);
+
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const navigate = useCallback(
     (href: string) => {
       setMinTimeReached(false);
 
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
 
-      timerRef.current = setTimeout(() => setMinTimeReached(true), 400);
+      timerRef.current = setTimeout(() => {
+        setMinTimeReached(true);
+      }, 400);
 
       startTransition(() => {
         router.push(href);
@@ -43,14 +52,20 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
     [router]
   );
 
-  const isPending = isTransitioning || !minTimeReached;
+  const isPending =
+    isTransitioning || !minTimeReached;
 
   return (
-    <LoadingContext.Provider value={{ isPending, navigate }}>
-      {isPending && <Loading />}
+    <LoadingContext.Provider
+      value={{
+        isPending,
+        navigate,
+      }}
+    >
       {children}
     </LoadingContext.Provider>
   );
 }
 
-export const useLoading = () => useContext(LoadingContext);
+export const useLoading = () =>
+  useContext(LoadingContext);

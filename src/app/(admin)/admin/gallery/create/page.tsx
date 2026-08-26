@@ -4,11 +4,41 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { GalleryCategory } from "@/types/gallery";
+import { getGoogleDriveThumbnailUrl } from "@/lib/GoogleDrive";
 
 const inputClass =
   "h-11 w-full rounded-xl border border-white/10 bg-slate-900 px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/10";
 
 const labelClass = "mb-2 block text-sm font-medium text-slate-300";
+
+
+function extractGoogleDriveId(value: string): string | null {
+  const input = value.trim();
+
+  const fileMatch = input.match(
+    /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/
+  );
+
+  if (fileMatch) {
+    return fileMatch[1];
+  }
+
+  const queryMatch = input.match(
+    /drive\.google\.com\/(?:open|uc)\?(?:[^#]*&)?id=([a-zA-Z0-9_-]+)/
+  );
+
+  if (queryMatch) {
+    return queryMatch[1];
+  }
+
+  if (/^[a-zA-Z0-9_-]+$/.test(input)) {
+    return input;
+  }
+
+  return null;
+}
+
+
 
 export default function CreateGalleryPage() {
   const supabase = createClient();
@@ -27,14 +57,49 @@ export default function CreateGalleryPage() {
     date: "",
   });
 
-  const isValidImage =
-    form.image.startsWith("http://") || form.image.startsWith("https://");
 
   function handleImageChange(value: string) {
     setForm({ ...form, image: value });
     setImageError(false);
     setImageLoading(true);
   }
+  
+
+  function extractGoogleDriveId(value: string): string | null {
+    const input = value.trim();
+
+    // Format:
+    // https://drive.google.com/file/d/FILE_ID/view
+    const fileMatch = input.match(
+      /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/
+    );
+
+    if (fileMatch) {
+      return fileMatch[1];
+    }
+
+    // Format:
+    // https://drive.google.com/open?id=FILE_ID
+    // https://drive.google.com/uc?id=FILE_ID
+    const queryMatch = input.match(
+      /drive\.google\.com\/(?:open|uc)\?(?:[^#]*&)?id=([a-zA-Z0-9_-]+)/
+    );
+
+    if (queryMatch) {
+      return queryMatch[1];
+    }
+
+    // Kalau user langsung memasukkan ID
+    if (/^[a-zA-Z0-9_-]+$/.test(input)) {
+      return input;
+    }
+
+    return null;
+  }
+
+  const driveId = extractGoogleDriveId(form.image);
+
+  const isValidImage = !!driveId;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,11 +107,21 @@ export default function CreateGalleryPage() {
     setLoading(true);
     setErrorMsg(null);
 
+    const driveId = extractGoogleDriveId(form.image);
+
+    if (!driveId) {
+      setLoading(false);
+      setErrorMsg(
+        "Link Google Drive tidak valid. Masukkan link Google Drive atau File ID."
+      );
+      return;
+    }
+
     const { error } = await supabase.from("gallery_items").insert([
       {
         title: form.title,
         description: form.description,
-        image: form.image,
+        image: driveId,
         category: form.category,
         date: form.date,
       },
@@ -167,7 +242,7 @@ export default function CreateGalleryPage() {
 
                 {isValidImage && !imageError && (
                   <img
-                    src={form.image}
+                    src={getGoogleDriveThumbnailUrl(driveId!)}
                     alt="Preview"
                     className="h-full w-full object-cover"
                     onLoad={() => setImageLoading(false)}

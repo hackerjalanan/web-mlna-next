@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchGalleryItems } from "@/service/gallery_client.service";
+import { fetchGalleryItems } from "@/service/gallery-client.service";
 import type { GalleryCategory, GalleryItem, SortOrder } from "@/types/gallery";
 
 export function useGallery() {

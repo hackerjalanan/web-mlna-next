@@ -54,7 +54,6 @@ export const metadata: Metadata = {
   ],
 
   creator: "Ade Maulana Hidayah",
-
   publisher: "Ade Maulana Hidayah",
 
   alternates: {
@@ -83,23 +82,6 @@ export const metadata: Metadata = {
 
     description:
       "Portfolio Ade Maulana Hidayah — Fullstack Developer dengan pengalaman dalam pengembangan aplikasi web menggunakan Laravel, Node.js, React.js, Next.js, dan MySQL.",
-
-    /*
-     * Jangan menggunakan favicon 192x192
-     * sebagai gambar OG 1200x630.
-     *
-     * Jika nanti kamu memiliki gambar OG 1200x630,
-     * tambahkan:
-     *
-     * images: [
-     *   {
-     *     url: "/og-image.png",
-     *     width: 1200,
-     *     height: 630,
-     *     alt: "Ade Maulana Hidayah | Fullstack Developer",
-     *   },
-     * ],
-     */
   },
 
   twitter: {
@@ -114,6 +96,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
+      {
         url: "/favicon.ico",
       },
       {
@@ -127,13 +113,8 @@ export const metadata: Metadata = {
         type: "image/png",
       },
       {
-        url: "/android-chrome-192x192.png",
-        sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        url: "/android-chrome-512x512.png",
-        sizes: "512x512",
+        url: "/favicon-96x96.png",
+        sizes: "96x96",
         type: "image/png",
       },
     ],
@@ -152,9 +133,6 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-/**
- * JSON-LD Structured Data
- */
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
@@ -207,7 +185,6 @@ export default function RootLayout({
       className="h-full antialiased"
     >
       <head>
-        {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -215,7 +192,6 @@ export default function RootLayout({
           }}
         />
 
-        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-BRS4WS2VSQ"
           strategy="afterInteractive"
