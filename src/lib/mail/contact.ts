@@ -15,10 +15,13 @@ const transporter = nodemailer.createTransport({
 const emailTemplate = ({
   title,
   children,
+  logoUrl,
 }: {
   title: string;
   children: string;
+  logoUrl: string;
 }) => {
+
   const date = new Date();
 
   const time = new Intl.DateTimeFormat("id-ID", {
@@ -50,7 +53,7 @@ const emailTemplate = ({
               <table cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="vertical-align:middle">
-                    <img src="cid:logo" width="70" height="70" style="display:block" />
+                    <img src="${logoUrl}" width="70" height="70" style="display:block" />
                   </td>
                   <td style="padding-left:20px;vertical-align:middle">
                     <div style="font-family:Cinzel,'Times New Roman',serif;font-size:34px;font-weight:bold;letter-spacing:6px;color:#ffffff;line-height:1">
@@ -90,7 +93,7 @@ const emailTemplate = ({
         <!-- FOOTER -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="padding:25px 40px;background:#f8fafc;font-size:12px;color:#64748b">
+            <td style="padding:25px 40px;background:#f8fafc;font-size:12px;color:#64738b">
               Adem Portfolio<br />
               © ${date.getFullYear()} All rights reserved.
             </td>
@@ -108,8 +111,8 @@ const emailTemplate = ({
 export async function sendContactEmail(data: ContactRequest) {
   const { name, email, subject, message } = data;
 
-  const logoPath = `${process.cwd()}/public/icon1.png`;
   const formattedMessage = message.replace(/\n/g, "<br/>");
+  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/icon1.png`;
 
   // EMAIL UNTUK OWNER
   await transporter.sendMail({
@@ -119,21 +122,22 @@ export async function sendContactEmail(data: ContactRequest) {
     subject: `New Contact Message - ${subject}`,
     html: emailTemplate({
       title: "New Contact Message",
+      logoUrl,
       children: `
         <h2 style="color:#0f172a;margin-top:0">New message received</h2>
         <p>Someone has contacted you through your portfolio website.</p>
 
         <table width="100%" style="margin-top:25px">
           <tr>
-            <td style="padding:8px 0;color:#64748b">Name</td>
+            <td style="padding:8px 0;color:#64768b">Name</td>
             <td style="padding:8px 0;font-weight:bold">${name}</td>
           </tr>
           <tr>
-            <td style="padding:8px 0;color:#64748b">Email</td>
+            <td style="padding:8px 0;color:#64768b">Email</td>
             <td style="padding:8px 0;font-weight:bold">${email}</td>
           </tr>
           <tr>
-            <td style="padding:8px 0;color:#64748b">Subject</td>
+            <td style="padding:8px 0;color:#64768b">Subject</td>
             <td style="padding:8px 0;font-weight:bold">${subject}</td>
           </tr>
         </table>
@@ -142,14 +146,8 @@ export async function sendContactEmail(data: ContactRequest) {
         <p>${formattedMessage}</p>
       `,
     }),
-    attachments: [
-      {
-        filename: "icon.png",
-        path: logoPath,
-        cid: "logo",
-      },
-    ],
   });
+
 
   // AUTO REPLY UNTUK PENGIRIM
   await transporter.sendMail({
@@ -158,6 +156,7 @@ export async function sendContactEmail(data: ContactRequest) {
     subject: "Message Received - Adem Portfolio",
     html: emailTemplate({
       title: "Thank You For Contacting Me",
+      logoUrl,
       children: `
         <h2 style="color:#0f172a">Hello ${name}</h2>
         <p>Thank you for reaching out through my portfolio website.</p>
@@ -172,12 +171,5 @@ export async function sendContactEmail(data: ContactRequest) {
         </p>
       `,
     }),
-    attachments: [
-      {
-        filename: "icon1.png",
-        path: logoPath,
-        cid: "logo",
-      },
-    ],
   });
 }
