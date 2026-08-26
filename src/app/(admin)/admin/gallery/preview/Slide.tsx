@@ -28,7 +28,7 @@ import type { GalleryItem } from "@/data/gallery";
 /* -------------------------------------------------------------------------- */
 
 const FALLBACK_ASPECT_RATIO = 4 / 3;
-
+ 
 interface SlideProps {
   slide: GalleryItem;
   isTouchDevice: boolean;
