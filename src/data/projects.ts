@@ -65,19 +65,6 @@ export const projects: Project[] = [
     github: "https://github.com/ademlna/Mobile-Authentication-App",
     demo: "https://ade-maulana.my.id/",
   },
-
-  {
-    title: "Babinsa Messenger",
-    slug: "babinsa-messenger",
-    category: "Web App",
-    year: "2024-2025",
-    description:
-      "Aplikasi komunikasi berbasis web dengan REST API untuk kebutuhan komunikasi.",
-    technologies: ["Node.js", "Express.js", "MySQL"],
-    image: "/projects/babinsa-messenger.jpg",
-    github: "#",
-    demo: "#",
-  },
   {
     title: "Aplikasi Ecomerce Berbasis Web",
     slug: "aplikasi-ecommerce-berbasis-web",
