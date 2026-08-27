@@ -21,6 +21,7 @@ const TOOLS = [
   { name: "Image Compressor", href: "/toolskit/image-compressor", icon: FaImage },
   { name: "JSON Formatter", href: "/toolskit/json-formatter", icon: FaCode },
   { name: "Color Palette", href: "/toolskit/color-palette", icon: FaPalette },
+  { name: "tsx Formatter", href: "/toolskit/tsx-formatter", icon: FaCode },
 ];
 
 export default function ToolsLayout({
