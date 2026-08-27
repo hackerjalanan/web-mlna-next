@@ -9,10 +9,9 @@ type SortOption = "newest" | "oldest" | "name";
 
 const categories = [
   "Semua",
+  "Mobile App",
   "UI/UX Design",
   "Web App",
-  "Photography",
-  "Branding",
 ] as const;
 
 type Category = (typeof categories)[number];
@@ -90,7 +89,7 @@ export default function Projects() {
   }, [activeCategory, search, sortBy]);
 
   return (
-    <section className="mx-auto  max-w-[1440px] ">
+    <section className="mx-auto py-4 max-w-[1440px] ">
       <div className="space-y-10 mx-4">
         {/* =====================================================
             HEADER
@@ -98,7 +97,7 @@ export default function Projects() {
 
         <div className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Karya & Proyek
+            Project
           </h1>
 
           <p className="max-w-2xl text-sm leading-7 text-slate-400">
