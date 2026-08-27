@@ -19,7 +19,7 @@ export const projects: Project[] = [
     category: "Web App",
     year: "2026",
     description:
-      "Sistem untuk monitoring dan pelaporan training dengan notification by email.",
+      "Sistem untuk monitoring dan pelaporan training dengan notifikasi email.",
     technologies: ["React.js", "Node.js", "MySQL"],
     image: "/projects/training-report.jpg",
     github: "https://github.com/ademlna/training-report-gii.git",
@@ -33,7 +33,7 @@ export const projects: Project[] = [
     category: "Web App",
     year: "2026",
     description:
-      "Portfolio personal dengan Next.js dan Tailwind CSS untuk menampilkan profile dan project.",
+        "Website portfolio personal berbasis Next.js dan Tailwind CSS, dirancang responsif dan modern sebagai representasi diri secara digital.",
     technologies: ["Next.js", "TypeScript", "Tailwind CSS","PostgreSQL"],
     image: "/projects/personal-portfolio.jpg",
     github: "https://github.com/ademlna/personal-portofolio.git",
