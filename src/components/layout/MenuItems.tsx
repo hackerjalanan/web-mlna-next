@@ -5,6 +5,7 @@ import {
   Images,
   FileText,
   User,
+  Wrench,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -38,6 +39,11 @@ export const menuItems: MenuItem[] = [
     name: "Guide",
     href: "/guide",
     icon: <FileText {...iconProps} />,
+  },
+  {
+    name: "Toolskit",
+    href: "/toolskit",
+    icon: <Wrench {...iconProps} />,
   },
   {
     name: "About",
