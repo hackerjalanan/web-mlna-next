@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { createPortal } from "react-dom";
-
 interface Particle {
   id: number;
   angle: number;
@@ -71,9 +69,19 @@ const sizeConfig: Record<
   },
 };
 
-const SHOW_DURATION = 20500;
+const SHOW_DURATION = 10500;
 
-export default function FireworkButton() {
+interface FireworkButtonProps {
+  inline?: boolean;
+  onLaunch?: () => void;
+}
+
+
+export default function FireworkButton({
+  inline = false,
+  onLaunch,
+}: FireworkButtonProps) {
+  
   const [count, setCount] = useState<number>(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [fireworks, setFireworks] = useState<Firework[]>([]);
@@ -367,40 +375,17 @@ export default function FireworkButton() {
       </div>
 
       {/* =========================================
-          DIRGAHAYU INDONESIA
+          Caption flare
       ========================================== */}
       {showGreeting && (
         <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
-          <div className="dirgahayu-floating">
-            <div className="indonesia-flag">
-              <div className="flag-red" />
-              <div className="flag-white" />
-            </div>
-
-            <div className="mt-1 text-center text-white">
-              <div className="text-[10px]">
-                DIRGAHAYU
-              </div>
-
-              <div className="text-[11px]">
-                REPUBLIK INDONESIA
-              </div>
-
-              <div className="text-[16px]">
-                81
-              </div>
-
-              <div className="text-[7px]">
-                TAHUN
-              </div>
-            </div>
-          </div>
+          
         </div>
       )}
       {/* =========================================
           FIREWORK BUTTON
       ========================================== */}
-      <div className="fixed bottom-22 right-6 z-[10000] md:bottom-9">
+      
         <div className="relative flex flex-col items-center">
 
           {/* Jumlah kembang api */}
@@ -502,14 +487,10 @@ export default function FireworkButton() {
 </svg>
           </button>
         </div>
-      </div>
     </>
   );
 
   if (!mounted) return null;
 
-  return createPortal(
-    content,
-    document.body
-  );
+  return content;
 }

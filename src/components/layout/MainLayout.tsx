@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Breadcrumb from "@/components/layout/Breadcrumb";
-import FireworkButton from "@/components/sections/FireworkButton";
 import Footer from "@/components/layout/Footer";
 import { useLoading } from "@/context/LoadingContext";
 import Loading from "@/context/Loading";
 import { usePathname } from "next/navigation";
+import FloatingMenu from '@/components/FloatingMenu';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(true);
@@ -51,7 +51,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         )}
       </main>
 
-      <FireworkButton />
+      <FloatingMenu />
     </div>
   );
 }
