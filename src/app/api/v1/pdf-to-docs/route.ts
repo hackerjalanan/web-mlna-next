@@ -36,7 +36,7 @@ export const POST = apiHandler(async (request: Request) => {
 
   const fileName = file.name.replace(/\.pdf$/i, "") || "converted";
 
-  return new Response(docxBuffer, {
+  return new Response(new Uint8Array(docxBuffer), {
     status: 200,
     headers: {
       "Content-Type":
