@@ -10,7 +10,6 @@ export default function SiteLayout({
   return (
     <BotGate>
       <LoadingProvider>
-
         <MainLayout>{children}</MainLayout>
       </LoadingProvider>
     </BotGate>
