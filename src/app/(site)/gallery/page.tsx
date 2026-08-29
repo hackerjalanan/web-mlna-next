@@ -38,7 +38,7 @@ export default function Gallery() {
         <p className="mb-2 text-sm text-cyan-400">MY COLLECTION</p>
         <h1 className="text-3xl font-bold text-white md:text-4xl">Gallery</h1>
         <p className="mt-2 max-w-xl text-sm text-slate-400">
-          Kumpulan foto, desain, project, dan aktivitas yang pernah saya kerjakan.
+          Kumpulan foto, desain, dan aktivitas.
         </p>
       </div>
 
