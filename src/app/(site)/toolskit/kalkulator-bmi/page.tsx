@@ -2,7 +2,15 @@
 
 import React, { useState } from "react";
 
-const CATEGORIES = [
+type Category = {
+  label: string;
+  min: number;
+  max: number;
+  color: string;
+  advice: string;
+};
+
+const CATEGORIES: Category[] = [
   { label: "Kurang", min: 0, max: 18.5, color: "#00E6FF", advice: "Konsultasikan pola makan dengan tenaga kesehatan untuk menambah berat badan secara sehat." },
   { label: "Normal", min: 18.5, max: 25, color: "#00B2FF", advice: "Berat badan berada pada rentang sehat. Pertahankan pola makan dan aktivitas fisik." },
   { label: "Lebih", min: 25, max: 30, color: "#006BFF", advice: "Pertimbangkan menambah aktivitas fisik dan menjaga asupan kalori harian." },
@@ -12,18 +20,18 @@ const CATEGORIES = [
 const SCALE_MIN = 15;
 const SCALE_MAX = 35;
 
-function getCategoryIndex(bmi) {
+function getCategoryIndex(bmi: number): number {
   return CATEGORIES.findIndex((c) => bmi >= c.min && bmi < c.max);
 }
 
 export default function BmiCalculator() {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<{ bmi: number; categoryIndex: number } | null>(null);
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const h = parseFloat(height.replace(",", "."));
     const w = parseFloat(weight.replace(",", "."));
@@ -52,10 +60,7 @@ export default function BmiCalculator() {
   const markerLeft = markerPct !== null ? ((markerPct - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100 : 0;
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center font-sans"
-      
-    >
+    <div className="min-h-screen w-full flex items-center justify-center font-sans">
       <div className="w-full max-w-md">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-sky-200 tracking-tight">
@@ -110,11 +115,11 @@ export default function BmiCalculator() {
           </form>
         </div>
 
-        {result && (
+        {result && category && (
           <div className="mt-4 bg-[#031826] border border-[#06304a] rounded-xl shadow-lg p-6 sm:p-7">
             <div className="flex items-baseline justify-between">
               <div>
-                <div className="font-mono text-4xl font-medium text-gray-900 tabular-nums">
+                <div className="font-mono text-4xl font-medium text-sky-50 tabular-nums">
                   {result.bmi.toFixed(1)}
                 </div>
                 <div className="text-xs text-gray-400 mt-0.5">kg/m²</div>
