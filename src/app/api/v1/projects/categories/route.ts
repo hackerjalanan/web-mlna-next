@@ -4,7 +4,7 @@
 // ============================================
 
 import { NextResponse } from "next/server";
-import { projectService } from "@/services/projects";
+import { projectService } from "@/services/projects.service";
 
 // ============================================
 // GET /api/v1/projects/categories - Get all unique categories
