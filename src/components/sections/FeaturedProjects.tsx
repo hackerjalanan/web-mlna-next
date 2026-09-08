@@ -1,5 +1,5 @@
 import { ArrowUpRight, Code2, ExternalLink } from "lucide-react";
-import { projectService } from "@/services/projects";
+import { projectService } from "@/services/projects.service";
 import type { Project } from "@/types/projects";
 
 const truncate = (text: string, maxLength = 46) =>
