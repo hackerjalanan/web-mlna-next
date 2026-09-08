@@ -9,10 +9,11 @@ const COLORS = [
 
 const SHOW_DURATION = 10500;
 
+// particleCount dikurangi ~50% dari versi sebelumnya
 const sizeConfig = {
-  small: { particleCount: 18, distance: [40, 70], particleSize: 4, rocketDuration: 450, burstDuration: 700 },
-  medium: { particleCount: 36, distance: [80, 140], particleSize: 6, rocketDuration: 600, burstDuration: 950 },
-  large: { particleCount: 60, distance: [130, 220], particleSize: 8, rocketDuration: 750, burstDuration: 1300 },
+  small: { particleCount: 9, distance: [40, 70], particleSize: 4, rocketDuration: 450, burstDuration: 700 },
+  medium: { particleCount: 18, distance: [80, 140], particleSize: 6, rocketDuration: 600, burstDuration: 950 },
+  large: { particleCount: 30, distance: [130, 220], particleSize: 8, rocketDuration: 750, burstDuration: 1300 },
 } as const;
 
 type Size = keyof typeof sizeConfig;
@@ -22,7 +23,12 @@ type Firework = {
   color: string; phase: "launch" | "explode"; size: Size; particleDistances: number[];
 };
 
-export default function FireworkButton() {
+interface FireworkButtonProps {
+  inline?: boolean;
+  onLaunch?: () => void;
+}
+
+export default function FireworkButton({ inline, onLaunch }: FireworkButtonProps) {
   const [count, setCount] = useState(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [fireworks, setFireworks] = useState<Firework[]>([]);
@@ -30,7 +36,7 @@ export default function FireworkButton() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isShowRunning, setIsShowRunning] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const timeoutsRef = useRef<number[]>([]);
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const fireworkIdRef = useRef(0);
 
   useEffect(() => {
@@ -38,7 +44,7 @@ export default function FireworkButton() {
     return () => {
       timeoutsRef.current.forEach(clearTimeout);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -58,9 +64,9 @@ export default function FireworkButton() {
   }, []);
 
   const createButtonSparkle = () => {
-    const newParticles = Array.from({ length: 24 }, (_, i) => ({
+    const newParticles = Array.from({ length: 12 }, (_, i) => ({
       id: Date.now() + i,
-      angle: (360 / 24) * i,
+      angle: (360 / 12) * i,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       distance: 60 + Math.random() * 40,
     }));
@@ -101,12 +107,14 @@ export default function FireworkButton() {
   const launchFireworks = useCallback(() => {
     let elapsed = 0;
     while (elapsed < SHOW_DURATION) {
-      const burstCount = 2 + Math.floor(Math.random() * 3);
+      // burstCount dikurangi: dulu 2-4, sekarang 1-2
+      const burstCount = 1 + Math.floor(Math.random() * 2);
       for (let i = 0; i < burstCount; i++) {
         spawnFirework(elapsed + i * 60 + Math.random() * 40);
       }
       const progress = elapsed / SHOW_DURATION;
-      elapsed += 180 + progress * 300 + Math.random() * 150;
+      // interval antar ledakan diperlebar sedikit supaya lebih jarang
+      elapsed += 260 + progress * 400 + Math.random() * 200;
     }
   }, [spawnFirework]);
 
@@ -118,6 +126,7 @@ export default function FireworkButton() {
     try {
       createButtonSparkle();
       launchFireworks();
+      onLaunch?.();
 
       const endShowTimeout = setTimeout(() => setIsShowRunning(false), SHOW_DURATION + 500);
       timeoutsRef.current.push(endShowTimeout);
@@ -184,9 +193,11 @@ export default function FireworkButton() {
 
       {/* Button */}
       <div className="relative flex flex-col items-center">
-        <span className="mb-1 min-w-[28px] text-center text-xs font-semibold text-white/80">
-          {loading ? "..." : count}
-        </span>
+        {!inline && (
+          <span className="mb-1 min-w-[28px] text-center text-xs font-semibold text-white/80">
+            {loading ? "..." : count}
+          </span>
+        )}
 
         {particles.map((p) => (
           <span

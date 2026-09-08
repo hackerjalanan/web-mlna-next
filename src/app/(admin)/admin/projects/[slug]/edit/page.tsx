@@ -44,7 +44,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
   const [slug, setSlug] = useState<string>("");
   
   // State form
-  const [formData, setFormData] = useState<Project & { technologies: string }>({
+  const [formData, setFormData] = useState<Omit<Project, "technologies"> & { technologies: string }>({
     id: "",
     title: "",
     slug: "",
@@ -65,8 +65,8 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [success, setSuccess] = useState<string | undefined>(undefined);
   const [categories, setCategories] = useState<string[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
@@ -136,8 +136,8 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
   // Handle submit (Update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
+    setError(undefined);
+    setSuccess(undefined);
     setIsSubmitting(true);
 
     try {
@@ -159,14 +159,14 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
       const payload: UpdateProjectInput = {
         title: formData.title,
         slug: formData.slug,
-        category: formData.category || null,
-        year: formData.year || null,
-        description: formData.description || null,
+        category: formData.category || undefined,
+        year: formData.year || undefined,
+        description: formData.description || undefined,
         technologies,
-        image: formData.image || null,
-        link: formData.link || null,
-        github: formData.github || null,
-        demo: formData.demo || null,
+        image: formData.image || undefined,
+        link: formData.link || undefined,
+        github: formData.github || undefined,
+        demo: formData.demo || undefined,
         featured: formData.featured || false,
       };
 
@@ -195,8 +195,8 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
       return;
     }
     
-    setError(null);
-    setSuccess(null);
+    setError(undefined);
+    setSuccess(undefined);
     setIsDeleting(true);
 
     try {

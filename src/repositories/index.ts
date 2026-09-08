@@ -1,2 +1,2 @@
 // Repositories barrel export
-export * from "./projects/projectRepository";
+export * from "./projects.repository";

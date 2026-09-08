@@ -238,3 +238,15 @@ portfolio/
 ├── tsconfig.json
 ├── next.config.ts
 └── README.md
+
+
+
+File yang kamu kirim ini (CreateGalleryPage) bukan salah satu penyebab error di log build. Error yang muncul di log semuanya dari file lain:
+
+src/app/(admin)/admin/projects/[slug]/edit/page.tsx
+src/app/(site)/projects/page.tsx
+src/components/FloatingMenu.tsx
+src/components/sections/FireworkButton.tsx
+src/repositories/index.ts & src/services/index.ts
+
+File gallery ini tidak disebut sama sekali di log, jadi build tetap akan gagal dengan error yang sama walau file ini diperbaiki. Sepertinya ke-upload file yang salah — boleh cek lagi dan kirim salah satu dari 5 file di atas?

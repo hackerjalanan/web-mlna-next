@@ -17,16 +17,16 @@ interface Project {
   id: string;
   title: string;
   slug: string;
-  category: string | null;
-  year: string | null;
-  description: string | null;
+  category: string | undefined;
+  year: string | undefined;
+  description: string | undefined;
   technologies: string[];
-  image: string | null;
-  link: string | null;
-  github: string | null;
-  demo: string | null;
+  image: string | undefined;
+  link: string | undefined;
+  github: string | undefined;
+  demo: string | undefined;
   featured: boolean | null;
-  created_at: string | null;
+  created_at: string | undefined;
 }
 
 export default function Projects() {
@@ -40,7 +40,7 @@ export default function Projects() {
   const [showFilter, setShowFilter] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const isFiltered = search !== "" || activeCategory !== "" || sortBy !== "newest";
 
@@ -74,7 +74,7 @@ export default function Projects() {
         }
         const data = await response.json();
         setProjects(data);
-        setError(null);
+        setError(undefined);
       } catch (err) {
         console.error("Error fetching projects:", err);
         setError("Gagal memuat proyek. Silakan coba lagi.");
