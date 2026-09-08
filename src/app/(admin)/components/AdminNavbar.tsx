@@ -20,7 +20,7 @@ import { cinzel } from "@/lib/fonts";
 const navItems = [
   { name: "Home", href: "/admin/dashboard", icon: Home },
   { name: "Galeri", href: "/admin/gallery", icon: ImageIcon },
-  { name: "Projek", href: "/admin/projek", icon: FolderKanban },
+  { name: "Projek", href: "/admin/projects", icon: FolderKanban },
   { name: "Guide", href: "/admin/guide", icon: BookOpenText },
   { name: "About", href: "/admin/about", icon: UserRound },
 ];

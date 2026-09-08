@@ -3,7 +3,7 @@ import { json } from "@/lib/api/json";
 import { apiHandler } from "@/lib/api/handler";
 import { success } from "@/lib/api/response";
 import { getGoogleDriveThumbnailUrl } from "@/lib/GoogleDrive";
-import { getGalleryItems } from "@/service/gallery.service";
+import { getGalleryItems } from "@/services/gallery.service";
 import type { SortOrder, GalleryCategory } from "@/types/gallery";
 
 const ALLOWED_CATEGORIES: GalleryCategory[] = [
