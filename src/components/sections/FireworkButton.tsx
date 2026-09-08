@@ -1,118 +1,52 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-interface Particle {
-  id: number;
-  angle: number;
-  color: string;
-  distance: number;
-}
 
-type Size = "small" | "medium" | "large";
-
-interface Firework {
-  id: number;
-  startX: number;
-  endX: number;
-  peak: number;
-  curve: number;
-  color: string;
-  phase: "launch" | "explode";
-  size: Size;
-  particleDistances: number[];
-}
-
-const colors = [
-  "#22d3ee",
-  "#3b82f6",
-  "#a855f7",
-  "#ec4899",
-  "#facc15",
-  "#22c55e",
-  "#ffffff",
-  "#f97316",
-  "#ef4444",
+const COLORS = [
+  "#22d3ee", "#3b82f6", "#a855f7", "#ec4899",
+  "#facc15", "#22c55e", "#ffffff", "#f97316", "#ef4444",
 ];
-
-const sizeConfig: Record<
-  Size,
-  {
-    particleCount: number;
-    distance: [number, number];
-    particleSize: number;
-    rocketDuration: number;
-    burstDuration: number;
-  }
-> = {
-  small: {
-    particleCount: 18,
-    distance: [40, 70],
-    particleSize: 4,
-    rocketDuration: 450,
-    burstDuration: 700,
-  },
-
-  medium: {
-    particleCount: 36,
-    distance: [80, 140],
-    particleSize: 6,
-    rocketDuration: 600,
-    burstDuration: 950,
-  },
-
-  large: {
-    particleCount: 60,
-    distance: [130, 220],
-    particleSize: 8,
-    rocketDuration: 750,
-    burstDuration: 1300,
-  },
-};
 
 const SHOW_DURATION = 10500;
 
-interface FireworkButtonProps {
-  inline?: boolean;
-  onLaunch?: () => void;
-}
+const sizeConfig = {
+  small: { particleCount: 18, distance: [40, 70], particleSize: 4, rocketDuration: 450, burstDuration: 700 },
+  medium: { particleCount: 36, distance: [80, 140], particleSize: 6, rocketDuration: 600, burstDuration: 950 },
+  large: { particleCount: 60, distance: [130, 220], particleSize: 8, rocketDuration: 750, burstDuration: 1300 },
+} as const;
 
+type Size = keyof typeof sizeConfig;
+type Particle = { id: number; angle: number; color: string; distance: number };
+type Firework = {
+  id: number; startX: number; endX: number; peak: number; curve: number;
+  color: string; phase: "launch" | "explode"; size: Size; particleDistances: number[];
+};
 
-export default function FireworkButton({
-  inline = false,
-  onLaunch,
-}: FireworkButtonProps) {
-  
-  const [count, setCount] = useState<number>(0);
+export default function FireworkButton() {
+  const [count, setCount] = useState(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [fireworks, setFireworks] = useState<Firework[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isShowRunning, setIsShowRunning] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [showGreeting, setShowGreeting] = useState(false);
-  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const timeoutsRef = useRef<number[]>([]);
   const fireworkIdRef = useRef(0);
 
   useEffect(() => {
     setMounted(true);
-
     return () => {
       timeoutsRef.current.forEach(clearTimeout);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     const getCount = async () => {
       try {
-        const response = await fetch("/api/v1/fireworks", {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch fireworks count");
-        }
-
-        const data = await response.json();
+        const res = await fetch("/api/v1/fireworks", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch fireworks count");
+        const data = await res.json();
         setCount(data.count);
       } catch (error) {
         console.error(error);
@@ -120,176 +54,77 @@ export default function FireworkButton({
         setLoading(false);
       }
     };
-
     getCount();
   }, []);
 
   const createButtonSparkle = () => {
-    const newParticles: Particle[] = [];
-
-    for (let i = 0; i < 24; i++) {
-      newParticles.push({
-        id: Date.now() + i,
-        angle: (360 / 24) * i,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        distance: 60 + Math.random() * 40,
-      });
-    }
-
+    const newParticles = Array.from({ length: 24 }, (_, i) => ({
+      id: Date.now() + i,
+      angle: (360 / 24) * i,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      distance: 60 + Math.random() * 40,
+    }));
     setParticles(newParticles);
-
-    const timeout = setTimeout(() => {
-      setParticles([]);
-    }, 800);
-
+    const timeout = setTimeout(() => setParticles([]), 800);
     timeoutsRef.current.push(timeout);
   };
 
   const spawnFirework = useCallback((delay: number) => {
     const id = fireworkIdRef.current++;
-
-    // Titik awal roket
     const startX = 5 + Math.random() * 90;
-
-    // Seberapa jauh roket bergerak ke kiri/kanan
-    const horizontalDistance =
-      -25 + Math.random() * 50;
-
-    const endX = Math.max(
-      3,
-      Math.min(97, startX + horizontalDistance)
-    );
-
-    // Tinggi ledakan
+    const endX = Math.max(3, Math.min(97, startX + (-25 + Math.random() * 50)));
     const peak = 35 + Math.random() * 45;
-
-    // Lengkungan lintasan
-    const curve =
-      -15 + Math.random() * 30;
-
-    const color =
-      colors[Math.floor(Math.random() * colors.length)];
-
+    const curve = -15 + Math.random() * 30;
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
     const roll = Math.random();
-
-    const size: Size =
-      roll < 0.5
-        ? "small"
-        : roll < 0.85
-          ? "medium"
-          : "large";
-
+    const size: Size = roll < 0.5 ? "small" : roll < 0.85 ? "medium" : "large";
     const cfg = sizeConfig[size];
 
     const particleDistances = Array.from(
       { length: cfg.particleCount },
-      () =>
-        cfg.distance[0] +
-        Math.random() *
-          (cfg.distance[1] - cfg.distance[0])
+      () => cfg.distance[0] + Math.random() * (cfg.distance[1] - cfg.distance[0])
     );
 
     const t1 = setTimeout(() => {
-      setFireworks((prev) => [
-        ...prev,
-        {
-          id,
-          startX,
-          endX,
-          peak,
-          curve,
-          color,
-          phase: "launch",
-          size,
-          particleDistances,
-        },
-      ]);
+      setFireworks((prev) => [...prev, { id, startX, endX, peak, curve, color, phase: "launch", size, particleDistances }]);
 
       const t2 = setTimeout(() => {
-        setFireworks((prev) =>
-          prev.map((f) =>
-            f.id === id
-              ? {
-                  ...f,
-                  phase: "explode",
-                }
-              : f
-          )
-        );
-
-        const t3 = setTimeout(() => {
-          setFireworks((prev) =>
-            prev.filter((f) => f.id !== id)
-          );
-        }, cfg.burstDuration);
-
+        setFireworks((prev) => prev.map((f) => (f.id === id ? { ...f, phase: "explode" } : f)));
+        const t3 = setTimeout(() => setFireworks((prev) => prev.filter((f) => f.id !== id)), cfg.burstDuration);
         timeoutsRef.current.push(t3);
       }, cfg.rocketDuration);
-
       timeoutsRef.current.push(t2);
     }, delay);
-
     timeoutsRef.current.push(t1);
   }, []);
 
   const launchFireworks = useCallback(() => {
     let elapsed = 0;
-
     while (elapsed < SHOW_DURATION) {
-      const burstCount =
-        2 + Math.floor(Math.random() * 3);
-
+      const burstCount = 2 + Math.floor(Math.random() * 3);
       for (let i = 0; i < burstCount; i++) {
-        spawnFirework(
-          elapsed +
-            i * 60 +
-            Math.random() * 40
-        );
+        spawnFirework(elapsed + i * 60 + Math.random() * 40);
       }
-
       const progress = elapsed / SHOW_DURATION;
-
-      const interval =
-        180 +
-        progress * 300 +
-        Math.random() * 150;
-
-      elapsed += interval;
+      elapsed += 180 + progress * 300 + Math.random() * 150;
     }
   }, [spawnFirework]);
 
   const handleClick = async () => {
     if (loading || isSubmitting || isShowRunning) return;
-
     setIsSubmitting(true);
     setIsShowRunning(true);
 
     try {
-      setShowGreeting(true);
-
       createButtonSparkle();
       launchFireworks();
 
-      const greetingTimeout = setTimeout(() => {
-        setShowGreeting(false);
-        setIsShowRunning(false);
-      }, SHOW_DURATION + 500);
+      const endShowTimeout = setTimeout(() => setIsShowRunning(false), SHOW_DURATION + 500);
+      timeoutsRef.current.push(endShowTimeout);
 
-      timeoutsRef.current.push(greetingTimeout);
-
-      const response = await fetch("/api/v1/fireworks", {
-        method: "POST",
-        cache: "no-store",
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          "Failed to increment fireworks"
-        );
-      }
-
-      const data = await response.json();
-
+      const res = await fetch("/api/v1/fireworks", { method: "POST", cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to increment fireworks");
+      const data = await res.json();
       setCount(data.count);
     } catch (error) {
       console.error(error);
@@ -298,73 +133,46 @@ export default function FireworkButton({
     }
   };
 
-  const content = (
+  if (!mounted) return null;
+
+  return (
     <>
-      {/* =========================================
-          FIREWORKS BACKGROUND
-      ========================================== */}
+      {/* Fireworks Background */}
       <div className="pointer-events-none fixed inset-0 z-[9998] overflow-hidden">
         {fireworks.map((fw) => {
           const cfg = sizeConfig[fw.size];
-
           return (
-           <div
-              key={fw.id}
-              className="absolute bottom-0"
-              style={{
-                left: `${fw.startX}%`,
-              }}
-            >
+            <div key={fw.id} className="absolute bottom-0" style={{ left: `${fw.startX}%` }}>
               {fw.phase === "launch" ? (
                 <span
                   className="firework-rocket"
-                  style={
-                    {
-                      "--start-x": "0px",
-                      "--end-x": `${(fw.endX - fw.startX) * 1}vw`,
-                      "--peak": `${fw.peak}vh`,
-                      "--curve": `${fw.curve}vw`,
-                      "--duration": `${cfg.rocketDuration}ms`,
-                      width: `${Math.max(
-                        3,
-                        cfg.particleSize - 2
-                      )}px`,
-                      height: `${cfg.particleSize * 2.5}px`,
-                      backgroundColor: fw.color,
-                      boxShadow: `0 0 ${
-                        cfg.particleSize + 4
-                      }px 2px ${fw.color}`,
-                    } as React.CSSProperties
-                  }
+                  style={{
+                    "--start-x": "0px",
+                    "--end-x": `${fw.endX - fw.startX}vw`,
+                    "--peak": `${fw.peak}vh`,
+                    "--curve": `${fw.curve}vw`,
+                    "--duration": `${cfg.rocketDuration}ms`,
+                    width: `${Math.max(3, cfg.particleSize - 2)}px`,
+                    height: `${cfg.particleSize * 2.5}px`,
+                    backgroundColor: fw.color,
+                    boxShadow: `0 0 ${cfg.particleSize + 4}px 2px ${fw.color}`,
+                  } as React.CSSProperties}
                 />
               ) : (
-                <div
-                  className="absolute"
-                  style={{
-                    bottom: `${fw.peak}vh`,
-                  }}
-                >
-                  {Array.from({
-                    length: cfg.particleCount,
-                  }).map((_, i) => (
+                <div className="absolute" style={{ bottom: `${fw.peak}vh` }}>
+                  {Array.from({ length: cfg.particleCount }).map((_, i) => (
                     <span
                       key={i}
                       className="firework-burst-particle"
-                      style={
-                        {
-                          "--angle": `${
-                            (360 / cfg.particleCount) * i
-                          }deg`,
-                          "--distance": `${fw.particleDistances[i]}px`,
-                          "--duration": `${cfg.burstDuration}ms`,
-                          width: `${cfg.particleSize}px`,
-                          height: `${cfg.particleSize}px`,
-                          backgroundColor: fw.color,
-                          boxShadow: `0 0 ${
-                            cfg.particleSize + 4
-                          }px ${fw.color}`,
-                        } as React.CSSProperties
-                      }
+                      style={{
+                        "--angle": `${(360 / cfg.particleCount) * i}deg`,
+                        "--distance": `${fw.particleDistances[i]}px`,
+                        "--duration": `${cfg.burstDuration}ms`,
+                        width: `${cfg.particleSize}px`,
+                        height: `${cfg.particleSize}px`,
+                        backgroundColor: fw.color,
+                        boxShadow: `0 0 ${cfg.particleSize + 4}px ${fw.color}`,
+                      } as React.CSSProperties}
                     />
                   ))}
                 </div>
@@ -374,123 +182,58 @@ export default function FireworkButton({
         })}
       </div>
 
-      {/* =========================================
-          Caption flare
-      ========================================== */}
-      {showGreeting && (
-        <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
-          
-        </div>
-      )}
-      {/* =========================================
-          FIREWORK BUTTON
-      ========================================== */}
-      
-        <div className="relative flex flex-col items-center">
+      {/* Button */}
+      <div className="relative flex flex-col items-center">
+        <span className="mb-1 min-w-[28px] text-center text-xs font-semibold text-white/80">
+          {loading ? "..." : count}
+        </span>
 
-          {/* Jumlah kembang api */}
+        {particles.map((p) => (
           <span
-            className="
-              mb-1 min-w-[28px]
-              text-center text-xs font-semibold
-              text-white/80
-            "
-          >
-            {loading ? "..." : count}
-          </span>
+            key={p.id}
+            className="firework-particle"
+            style={{
+              "--angle": `${p.angle}deg`,
+              "--distance": `${p.distance}px`,
+              backgroundColor: p.color,
+              boxShadow: `0 0 8px ${p.color}`,
+            } as React.CSSProperties}
+          />
+        ))}
 
-          {/* Particle */}
-          {particles.map((particle) => (
-            <span
-              key={particle.id}
-              className="firework-particle"
-              style={
-                {
-                  "--angle": `${particle.angle}deg`,
-                  "--distance": `${particle.distance}px`,
-                  backgroundColor: particle.color,
-                  boxShadow: `0 0 8px ${particle.color}`,
-                } as React.CSSProperties
-              }
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={loading || isSubmitting}
+          aria-label="Fireworks"
+          className="group relative flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-slate-900/90 text-white shadow-xl shadow-cyan-500/20 backdrop-blur-xl transition-all duration-200 hover:scale-110 hover:border-cyan-400/40 hover:shadow-cyan-400/40 active:scale-90 disabled:cursor-wait"
+        >
+          <svg
+            className="relative z-10 h-8 w-8 animate-[pulse_1.2s_ease-in-out_infinite] drop-shadow-[0_0_10px_rgba(249,115,22,0.9)] transition-transform group-hover:scale-125"
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="fireGradient" x1="32" y1="8" x2="32" y2="58">
+                <stop stopColor="#fde047" />
+                <stop offset="0.45" stopColor="#f97316" />
+                <stop offset="1" stopColor="#dc2626" />
+              </linearGradient>
+            </defs>
+            <path
+              className="animate-[pulse_0.8s_ease-in-out_infinite]"
+              d="M32 4 C38 15 49 20 49 34 C49 47 41 56 32 56 C19 56 12 47 12 36 C12 25 22 19 27 9 C28 7 30 5 32 4Z"
+              fill="url(#fireGradient)"
             />
-          ))}
-
-          {/* Tombol */}
-          <button
-            type="button"
-            onClick={handleClick}
-            disabled={loading || isSubmitting}
-            aria-label="Fireworks"
-            className="
-              group relative
-              flex h-14 w-14
-              items-center justify-center
-              rounded-full
-              border border-white/10
-              bg-slate-900/90
-              text-white
-              shadow-xl shadow-cyan-500/20
-              backdrop-blur-xl
-              transition-all duration-200
-              hover:scale-110
-              hover:border-cyan-400/40
-              hover:shadow-cyan-400/40
-              active:scale-90
-              disabled:cursor-wait
-            "
-          >
-            <svg
-  className="
-    relative z-10
-    h-8 w-8
-    animate-[pulse_1.2s_ease-in-out_infinite]
-    drop-shadow-[0_0_10px_rgba(249,115,22,0.9)]
-    transition-transform
-    group-hover:scale-125
-  "
-  viewBox="0 0 64 64"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <defs>
-    <linearGradient id="fireGradient" x1="32" y1="8" x2="32" y2="58">
-      <stop stopColor="#fde047" />
-      <stop offset="0.45" stopColor="#f97316" />
-      <stop offset="1" stopColor="#dc2626" />
-    </linearGradient>
-  </defs>
-
-  <path
-    className="animate-[pulse_0.8s_ease-in-out_infinite]"
-    d="
-      M32 4
-      C38 15 49 20 49 34
-      C49 47 41 56 32 56
-      C19 56 12 47 12 36
-      C12 25 22 19 27 9
-      C28 7 30 5 32 4Z
-    "
-    fill="url(#fireGradient)"
-  />
-
-  <path
-    d="
-      M32 22
-      C36 30 41 33 41 40
-      C41 47 37 51 32 51
-      C25 51 22 46 22 41
-      C22 35 27 31 32 22Z
-    "
-    fill="#fff7ed"
-    className="animate-[pulse_0.6s_ease-in-out_infinite]"
-  />
-</svg>
-          </button>
-        </div>
+            <path
+              d="M32 22 C36 30 41 33 41 40 C41 47 37 51 32 51 C25 51 22 46 22 41 C22 35 27 31 32 22Z"
+              fill="#fff7ed"
+              className="animate-[pulse_0.6s_ease-in-out_infinite]"
+            />
+          </svg>
+        </button>
+      </div>
     </>
   );
-
-  if (!mounted) return null;
-
-  return content;
 }

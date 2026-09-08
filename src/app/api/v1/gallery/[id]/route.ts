@@ -1,7 +1,7 @@
 import { apiHandler } from "@/lib/api/handler";
 import { success, failure } from "@/lib/api/response";
 import { getGoogleDriveThumbnailUrl } from "@/lib/GoogleDrive";
-import { getGalleryItemById } from "@/service/gallery.service";
+import { getGalleryItemById } from "@/services/gallery.service";
 
 export const GET = apiHandler(async (
   request,

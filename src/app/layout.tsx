@@ -3,7 +3,9 @@ import Script from "next/script";
 import "./globals.css";
 import { LoadingProvider } from "@/context/LoadingContext";
 import { Toaster } from "sonner";
-
+import { Inter, Fraunces } from "next/font/google";
+const inter = Inter({ subsets: ["latin"] });
+const fraunces = Fraunces({ subsets: ["latin"] });
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
