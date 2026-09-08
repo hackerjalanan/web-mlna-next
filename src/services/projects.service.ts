@@ -3,7 +3,7 @@
 // Business logic layer for projects
 // ============================================
 
-import { projectRepository } from "@/repositories/projects";
+import { projectRepository } from "@/repositories/projects.repository";
 import type {
   Project,
   CreateProjectInput,

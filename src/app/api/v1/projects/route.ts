@@ -4,7 +4,7 @@
 // ============================================
 
 import { NextResponse } from "next/server";
-import { projectService } from "@/services/projects";
+import { projectService } from "@/services/projects.service";
 import type { CreateProjectInput } from "@/types/projects";
 
 // ============================================

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { projectService } from "@/services/projects";
+import { projectService } from "@/services/projects.service";
 import type { UpdateProjectInput } from "@/types/projects";
 
 // GET /api/v1/projects/[slug] - Get project by slug
