@@ -1,246 +1,1345 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 const COLORS = [
-  "#22d3ee", "#3b82f6", "#a855f7", "#ec4899",
-  "#facc15", "#22c55e", "#ffffff", "#f97316", "#ef4444",
+  "#22d3ee",
+  "#3b82f6",
+  "#a855f7",
+  "#ec4899",
+  "#facc15",
+  "#22c55e",
+  "#ffffff",
+  "#f97316",
+  "#ef4444",
 ];
 
 const SHOW_DURATION = 10500;
 
-// particleCount dikurangi ~50% dari versi sebelumnya
-const sizeConfig = {
-  small: { particleCount: 9, distance: [40, 70], particleSize: 4, rocketDuration: 450, burstDuration: 700 },
-  medium: { particleCount: 18, distance: [80, 140], particleSize: 6, rocketDuration: 600, burstDuration: 950 },
-  large: { particleCount: 30, distance: [130, 220], particleSize: 8, rocketDuration: 750, burstDuration: 1300 },
-} as const;
-
-type Size = keyof typeof sizeConfig;
-type Particle = { id: number; angle: number; color: string; distance: number };
-type Firework = {
-  id: number; startX: number; endX: number; peak: number; curve: number;
-  color: string; phase: "launch" | "explode"; size: Size; particleDistances: number[];
-};
-
-interface FireworkButtonProps {
+type FireworkButtonProps = {
   inline?: boolean;
   onLaunch?: () => void;
-}
+};
 
-export default function FireworkButton({ inline, onLaunch }: FireworkButtonProps) {
-  const [count, setCount] = useState(0);
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const [fireworks, setFireworks] = useState<Firework[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isShowRunning, setIsShowRunning] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const fireworkIdRef = useRef(0);
+type Rocket = {
+  x: number;
+  y: number;
+  targetX: number;
+  targetY: number;
+  vx: number;
+  vy: number;
+  color: string;
+  trail: {
+    x: number;
+    y: number;
+    alpha: number;
+  }[];
+};
 
-  useEffect(() => {
-    setMounted(true);
-    return () => {
-      timeoutsRef.current.forEach(clearTimeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+type Spark = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  gravity: number;
+  friction: number;
+  alpha: number;
+  decay: number;
+  size: number;
+  color: string;
+  twinkle: number;
+};
 
-  useEffect(() => {
-    const getCount = async () => {
+type Flash = {
+  x: number;
+  y: number;
+  radius: number;
+  alpha: number;
+  color: string;
+};
+
+export default function FireworkButton({
+  inline = false,
+  onLaunch,
+}: FireworkButtonProps) {
+  const canvasRef =
+    useRef<HTMLCanvasElement | null>(null);
+
+  const animationRef =
+    useRef<number | null>(null);
+
+  const runningRef =
+    useRef(false);
+
+  const showStartRef =
+    useRef(0);
+
+  const nextLaunchRef =
+    useRef(0);
+
+  const rocketsRef =
+    useRef<Rocket[]>([]);
+
+  const sparksRef =
+    useRef<Spark[]>([]);
+
+  const flashesRef =
+    useRef<Flash[]>([]);
+
+  const [count, setCount] =
+    useState<number | null>(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+
+  const [isShowRunning, setIsShowRunning] =
+    useState(false);
+
+  const [mounted, setMounted] =
+    useState(false);
+
+  /**
+   * ---------------------------------------------------------
+   * RANDOM HELPERS
+   * ---------------------------------------------------------
+   */
+
+  const random = (
+    min: number,
+    max: number,
+  ) => {
+    return (
+      min +
+      Math.random() * (max - min)
+    );
+  };
+
+  const randomColor = () => {
+    return COLORS[
+      Math.floor(
+        Math.random() * COLORS.length,
+      )
+    ];
+  };
+
+  /**
+   * ---------------------------------------------------------
+   * FETCH COUNTER
+   * ---------------------------------------------------------
+   */
+
+  const fetchCount = useCallback(
+    async () => {
       try {
-        const res = await fetch("/api/v1/fireworks", { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to fetch fireworks count");
-        const data = await res.json();
-        setCount(data.count);
+        const res = await fetch(
+          "/api/v1/fireworks",
+          {
+            method: "GET",
+            cache: "no-store",
+            headers: {
+              "Cache-Control":
+                "no-cache",
+            },
+          },
+        );
+
+        if (!res.ok) {
+          throw new Error(
+            "Failed to fetch fireworks count",
+          );
+        }
+
+        const data =
+          await res.json();
+
+        setCount(
+          Number(data.count) || 0,
+        );
       } catch (error) {
-        console.error(error);
+        console.error(
+          "Failed to get fireworks count:",
+          error,
+        );
+
+        setCount(0);
       } finally {
         setLoading(false);
       }
+    },
+    [],
+  );
+
+  /**
+   * ---------------------------------------------------------
+   * MOUNT
+   * ---------------------------------------------------------
+   */
+
+  useEffect(() => {
+    setMounted(true);
+
+    return () => {
+      if (
+        animationRef.current !==
+        null
+      ) {
+        cancelAnimationFrame(
+          animationRef.current,
+        );
+      }
+
+      runningRef.current = false;
+      rocketsRef.current = [];
+      sparksRef.current = [];
+      flashesRef.current = [];
     };
-    getCount();
   }, []);
 
-  const createButtonSparkle = () => {
-    const newParticles = Array.from({ length: 12 }, (_, i) => ({
-      id: Date.now() + i,
-      angle: (360 / 12) * i,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      distance: 60 + Math.random() * 40,
-    }));
-    setParticles(newParticles);
-    const timeout = setTimeout(() => setParticles([]), 800);
-    timeoutsRef.current.push(timeout);
-  };
+  useEffect(() => {
+    if (!mounted) return;
 
-  const spawnFirework = useCallback((delay: number) => {
-    const id = fireworkIdRef.current++;
-    const startX = 5 + Math.random() * 90;
-    const endX = Math.max(3, Math.min(97, startX + (-25 + Math.random() * 50)));
-    const peak = 35 + Math.random() * 45;
-    const curve = -15 + Math.random() * 30;
-    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    const roll = Math.random();
-    const size: Size = roll < 0.5 ? "small" : roll < 0.85 ? "medium" : "large";
-    const cfg = sizeConfig[size];
+    fetchCount();
+  }, [mounted, fetchCount]);
 
-    const particleDistances = Array.from(
-      { length: cfg.particleCount },
-      () => cfg.distance[0] + Math.random() * (cfg.distance[1] - cfg.distance[0])
+  /**
+   * ---------------------------------------------------------
+   * CANVAS RESIZE
+   * ---------------------------------------------------------
+   */
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const canvas =
+      canvasRef.current;
+
+    if (!canvas) return;
+
+    const ctx =
+      canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    const resize = () => {
+      const dpr =
+        Math.min(
+          window.devicePixelRatio || 1,
+          2,
+        );
+
+      canvas.width =
+        window.innerWidth * dpr;
+
+      canvas.height =
+        window.innerHeight * dpr;
+
+      canvas.style.width =
+        `${window.innerWidth}px`;
+
+      canvas.style.height =
+        `${window.innerHeight}px`;
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0,
+      );
+    };
+
+    resize();
+
+    window.addEventListener(
+      "resize",
+      resize,
     );
 
-    const t1 = setTimeout(() => {
-      setFireworks((prev) => [...prev, { id, startX, endX, peak, curve, color, phase: "launch", size, particleDistances }]);
+    return () => {
+      window.removeEventListener(
+        "resize",
+        resize,
+      );
+    };
+  }, [mounted]);
 
-      const t2 = setTimeout(() => {
-        setFireworks((prev) => prev.map((f) => (f.id === id ? { ...f, phase: "explode" } : f)));
-        const t3 = setTimeout(() => setFireworks((prev) => prev.filter((f) => f.id !== id)), cfg.burstDuration);
-        timeoutsRef.current.push(t3);
-      }, cfg.rocketDuration);
-      timeoutsRef.current.push(t2);
-    }, delay);
-    timeoutsRef.current.push(t1);
-  }, []);
+  /**
+   * ---------------------------------------------------------
+   * CREATE EXPLOSION
+   * ---------------------------------------------------------
+   */
 
-  const launchFireworks = useCallback(() => {
-    let elapsed = 0;
-    while (elapsed < SHOW_DURATION) {
-      // burstCount dikurangi: dulu 2-4, sekarang 1-2
-      const burstCount = 1 + Math.floor(Math.random() * 2);
-      for (let i = 0; i < burstCount; i++) {
-        spawnFirework(elapsed + i * 60 + Math.random() * 40);
+  const explode = useCallback(
+    (
+      x: number,
+      y: number,
+      color: string,
+    ) => {
+      const sizeRoll =
+        Math.random();
+
+      const particleCount =
+        sizeRoll > 0.86
+          ? 90
+          : sizeRoll > 0.45
+            ? 65
+            : 45;
+
+      const baseSpeed =
+        sizeRoll > 0.86
+          ? random(3.8, 6.2)
+          : sizeRoll > 0.45
+            ? random(3, 5)
+            : random(2.2, 4);
+
+      /**
+       * Main explosion
+       */
+      for (
+        let i = 0;
+        i < particleCount;
+        i++
+      ) {
+        const angle =
+          (Math.PI * 2 * i) /
+            particleCount +
+          random(-0.08, 0.08);
+
+        const speed =
+          baseSpeed *
+          random(0.65, 1.25);
+
+        sparksRef.current.push({
+          x,
+          y,
+
+          vx:
+            Math.cos(angle) *
+            speed,
+
+          vy:
+            Math.sin(angle) *
+            speed,
+
+          gravity: random(
+            0.045,
+            0.095,
+          ),
+
+          friction: random(
+            0.975,
+            0.988,
+          ),
+
+          alpha: 1,
+
+          decay: random(
+            0.007,
+            0.014,
+          ),
+
+          size: random(
+            1,
+            2.8,
+          ),
+
+          color:
+            Math.random() > 0.78
+              ? "#ffffff"
+              : color,
+
+          twinkle: random(
+            0.5,
+            1.5,
+          ),
+        });
       }
-      const progress = elapsed / SHOW_DURATION;
-      // interval antar ledakan diperlebar sedikit supaya lebih jarang
-      elapsed += 260 + progress * 400 + Math.random() * 200;
+
+      /**
+       * Secondary small sparks.
+       */
+      if (
+        Math.random() > 0.48
+      ) {
+        const secondaryCount =
+          Math.floor(
+            particleCount * 0.35,
+          );
+
+        for (
+          let i = 0;
+          i < secondaryCount;
+          i++
+        ) {
+          const angle =
+            Math.random() *
+            Math.PI *
+            2;
+
+          const speed =
+            random(1.2, 3.2);
+
+          sparksRef.current.push({
+            x,
+            y,
+
+            vx:
+              Math.cos(angle) *
+              speed,
+
+            vy:
+              Math.sin(angle) *
+              speed,
+
+            gravity: random(
+              0.025,
+              0.065,
+            ),
+
+            friction: random(
+              0.98,
+              0.992,
+            ),
+
+            alpha: 1,
+
+            decay: random(
+              0.009,
+              0.018,
+            ),
+
+            size: random(
+              0.6,
+              1.6,
+            ),
+
+            color:
+              Math.random() > 0.45
+                ? color
+                : "#ffffff",
+
+            twinkle: random(
+              0.5,
+              1.2,
+            ),
+          });
+        }
+      }
+
+      /**
+       * Explosion flash.
+       */
+      flashesRef.current.push({
+        x,
+        y,
+        radius: 8,
+        alpha: 0.95,
+        color,
+      });
+    },
+    [],
+  );
+
+  /**
+   * ---------------------------------------------------------
+   * CREATE ROCKET
+   * ---------------------------------------------------------
+   */
+
+  const createRocket =
+    useCallback(() => {
+      const width =
+        window.innerWidth;
+
+      const height =
+        window.innerHeight;
+
+      const x =
+        random(
+          width * 0.08,
+          width * 0.92,
+        );
+
+      /**
+       * Explosion position.
+       */
+      const targetX =
+        x +
+        random(-width * 0.18, width * 0.18);
+
+      const targetY =
+        random(
+          height * 0.15,
+          height * 0.5,
+        );
+
+      const startY =
+        height + 25;
+
+      const distance =
+        startY - targetY;
+
+      const duration =
+        random(45, 65);
+
+      const vy =
+        -(distance / duration);
+
+      const vx =
+        (targetX - x) /
+        duration;
+
+      rocketsRef.current.push({
+        x,
+        y: startY,
+
+        targetX,
+        targetY,
+
+        vx,
+        vy,
+
+        color:
+          randomColor(),
+
+        trail: [],
+      });
+    }, []);
+
+  /**
+   * ---------------------------------------------------------
+   * DRAW ROCKET
+   * ---------------------------------------------------------
+   */
+
+  const drawRocket = (
+    ctx: CanvasRenderingContext2D,
+    rocket: Rocket,
+  ) => {
+    /**
+     * Trail.
+     */
+    for (
+      let i = 0;
+      i < rocket.trail.length;
+      i++
+    ) {
+      const point =
+        rocket.trail[i];
+
+      const alpha =
+        (i /
+          rocket.trail.length) *
+        0.55;
+
+      ctx.beginPath();
+
+      ctx.arc(
+        point.x,
+        point.y,
+        random(0.7, 1.5),
+        0,
+        Math.PI * 2,
+      );
+
+      ctx.fillStyle =
+        `rgba(255,255,255,${alpha})`;
+
+      ctx.fill();
     }
-  }, [spawnFirework]);
 
-  const handleClick = async () => {
-    if (loading || isSubmitting || isShowRunning) return;
-    setIsSubmitting(true);
-    setIsShowRunning(true);
+    /**
+     * Rocket glow.
+     */
+    const gradient =
+      ctx.createRadialGradient(
+        rocket.x,
+        rocket.y,
+        0,
+        rocket.x,
+        rocket.y,
+        9,
+      );
 
-    try {
-      createButtonSparkle();
-      launchFireworks();
-      onLaunch?.();
+    gradient.addColorStop(
+      0,
+      "#ffffff",
+    );
 
-      const endShowTimeout = setTimeout(() => setIsShowRunning(false), SHOW_DURATION + 500);
-      timeoutsRef.current.push(endShowTimeout);
+    gradient.addColorStop(
+      0.25,
+      rocket.color,
+    );
 
-      const res = await fetch("/api/v1/fireworks", { method: "POST", cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to increment fireworks");
-      const data = await res.json();
-      setCount(data.count);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    gradient.addColorStop(
+      1,
+      "transparent",
+    );
+
+    ctx.fillStyle =
+      gradient;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      rocket.x,
+      rocket.y,
+      9,
+      0,
+      Math.PI * 2,
+    );
+
+    ctx.fill();
+
+    /**
+     * Rocket head.
+     */
+    ctx.beginPath();
+
+    ctx.arc(
+      rocket.x,
+      rocket.y,
+      2,
+      0,
+      Math.PI * 2,
+    );
+
+    ctx.fillStyle =
+      "#ffffff";
+
+    ctx.fill();
   };
 
-  if (!mounted) return null;
+  /**
+   * ---------------------------------------------------------
+   * DRAW SPARK
+   * ---------------------------------------------------------
+   */
+
+  const drawSpark = (
+    ctx: CanvasRenderingContext2D,
+    spark: Spark,
+  ) => {
+    const twinkle =
+      0.65 +
+      Math.sin(
+        performance.now() *
+          0.012 *
+          spark.twinkle,
+      ) *
+        0.35;
+
+    const radius =
+      spark.size *
+      twinkle;
+
+    const gradient =
+      ctx.createRadialGradient(
+        spark.x,
+        spark.y,
+        0,
+        spark.x,
+        spark.y,
+        radius * 5,
+      );
+
+    gradient.addColorStop(
+      0,
+      `rgba(255,255,255,${spark.alpha})`,
+    );
+
+    gradient.addColorStop(
+      0.25,
+      spark.color,
+    );
+
+    gradient.addColorStop(
+      1,
+      "transparent",
+    );
+
+    ctx.fillStyle =
+      gradient;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      spark.x,
+      spark.y,
+      radius * 5,
+      0,
+      Math.PI * 2,
+    );
+
+    ctx.fill();
+
+    /**
+     * Bright core.
+     */
+    ctx.beginPath();
+
+    ctx.arc(
+      spark.x,
+      spark.y,
+      radius,
+      0,
+      Math.PI * 2,
+    );
+
+    ctx.fillStyle =
+      spark.color;
+
+    ctx.fill();
+  };
+
+  /**
+   * ---------------------------------------------------------
+   * ANIMATION LOOP
+   * ---------------------------------------------------------
+   */
+
+  const animate =
+    useCallback(
+      (time: number) => {
+        const canvas =
+          canvasRef.current;
+
+        if (!canvas) return;
+
+        const ctx =
+          canvas.getContext("2d");
+
+        if (!ctx) return;
+
+        const width =
+          window.innerWidth;
+
+        const height =
+          window.innerHeight;
+
+        /**
+         * Soft fade instead of clearing instantly.
+         *
+         * This creates natural light trails.
+         */
+        ctx.fillStyle =
+          "rgba(2, 6, 23, 0.16)";
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height,
+        );
+
+        /**
+         * -----------------------------------------------------
+         * LAUNCH NEW ROCKET
+         * -----------------------------------------------------
+         */
+
+        if (
+          time >=
+          nextLaunchRef.current
+        ) {
+          createRocket();
+
+          /**
+           * Random launch interval.
+           */
+          nextLaunchRef.current =
+            time +
+            random(180, 650);
+
+          /**
+           * Sometimes launch two.
+           */
+          if (
+            Math.random() > 0.78
+          ) {
+            setTimeout(() => {
+              if (
+                runningRef.current
+              ) {
+                createRocket();
+              }
+            }, random(60, 180));
+          }
+        }
+
+        /**
+         * -----------------------------------------------------
+         * UPDATE ROCKETS
+         * -----------------------------------------------------
+         */
+
+        const rockets =
+          rocketsRef.current;
+
+        for (
+          let i = rockets.length - 1;
+          i >= 0;
+          i--
+        ) {
+          const rocket =
+            rockets[i];
+
+          /**
+           * Save trail point.
+           */
+          rocket.trail.push({
+            x: rocket.x,
+            y: rocket.y,
+            alpha: 1,
+          });
+
+          if (
+            rocket.trail.length >
+            12
+          ) {
+            rocket.trail.shift();
+          }
+
+          /**
+           * Slight horizontal drift.
+           */
+          rocket.vx +=
+            random(
+              -0.008,
+              0.008,
+            );
+
+          rocket.vx *= 0.998;
+
+          /**
+           * Rocket slows near target.
+           */
+          const distanceY =
+            rocket.y -
+            rocket.targetY;
+
+          if (
+            distanceY <
+            100
+          ) {
+            rocket.vy *=
+              0.985;
+          }
+
+          rocket.x +=
+            rocket.vx;
+
+          rocket.y +=
+            rocket.vy;
+
+          drawRocket(
+            ctx,
+            rocket,
+          );
+
+          /**
+           * Explode when reaching target.
+           */
+          if (
+            rocket.y <=
+              rocket.targetY ||
+            Math.abs(
+              rocket.x -
+                rocket.targetX,
+            ) < 8 &&
+              rocket.y <
+                rocket.targetY +
+                  30
+          ) {
+            explode(
+              rocket.x,
+              rocket.y,
+              rocket.color,
+            );
+
+            rockets.splice(
+              i,
+              1,
+            );
+          }
+        }
+
+        /**
+         * -----------------------------------------------------
+         * UPDATE SPARKS
+         * -----------------------------------------------------
+         */
+
+        const sparks =
+          sparksRef.current;
+
+        for (
+          let i = sparks.length - 1;
+          i >= 0;
+          i--
+        ) {
+          const spark =
+            sparks[i];
+
+          spark.vx *=
+            spark.friction;
+
+          spark.vy *=
+            spark.friction;
+
+          spark.vy +=
+            spark.gravity;
+
+          spark.x +=
+            spark.vx;
+
+          spark.y +=
+            spark.vy;
+
+          spark.alpha -=
+            spark.decay;
+
+          if (
+            spark.alpha <=
+              0 ||
+            spark.y >
+              height + 50
+          ) {
+            sparks.splice(
+              i,
+              1,
+            );
+
+            continue;
+          }
+
+          drawSpark(
+            ctx,
+            spark,
+          );
+        }
+
+        /**
+         * -----------------------------------------------------
+         * UPDATE FLASHES
+         * -----------------------------------------------------
+         */
+
+        const flashes =
+          flashesRef.current;
+
+        for (
+          let i = flashes.length - 1;
+          i >= 0;
+          i--
+        ) {
+          const flash =
+            flashes[i];
+
+          flash.radius +=
+            4.5;
+
+          flash.alpha *=
+            0.86;
+
+          const gradient =
+            ctx.createRadialGradient(
+              flash.x,
+              flash.y,
+              0,
+              flash.x,
+              flash.y,
+              flash.radius,
+            );
+
+          gradient.addColorStop(
+            0,
+            `rgba(255,255,255,${flash.alpha})`,
+          );
+
+          gradient.addColorStop(
+            0.15,
+            `${flash.color}`,
+          );
+
+          gradient.addColorStop(
+            1,
+            "transparent",
+          );
+
+          ctx.fillStyle =
+            gradient;
+
+          ctx.beginPath();
+
+          ctx.arc(
+            flash.x,
+            flash.y,
+            flash.radius,
+            0,
+            Math.PI * 2,
+          );
+
+          ctx.fill();
+
+          if (
+            flash.alpha <
+            0.025
+          ) {
+            flashes.splice(
+              i,
+              1,
+            );
+          }
+        }
+
+        /**
+         * -----------------------------------------------------
+         * END SHOW
+         * -----------------------------------------------------
+         */
+
+        const elapsed =
+          time -
+          showStartRef.current;
+
+        if (
+          elapsed >=
+          SHOW_DURATION
+        ) {
+          /**
+           * Jangan langsung berhenti.
+           * Biarkan sisa particle selesai.
+           */
+          if (
+            rockets.length ===
+              0 &&
+            sparks.length ===
+              0 &&
+            flashes.length ===
+              0
+          ) {
+            runningRef.current =
+              false;
+
+            setIsShowRunning(
+              false,
+            );
+
+            ctx.clearRect(
+              0,
+              0,
+              width,
+              height,
+            );
+
+            return;
+          }
+        }
+
+        animationRef.current =
+          requestAnimationFrame(
+            animate,
+          );
+      },
+      [createRocket, explode],
+    );
+
+  /**
+   * ---------------------------------------------------------
+   * START SHOW
+   * ---------------------------------------------------------
+   */
+
+  const launchFireworks =
+    useCallback(() => {
+      if (
+        runningRef.current
+      ) {
+        return;
+      }
+
+      runningRef.current =
+        true;
+
+      rocketsRef.current =
+        [];
+
+      sparksRef.current =
+        [];
+
+      flashesRef.current =
+        [];
+
+      const canvas =
+        canvasRef.current;
+
+      if (canvas) {
+        const ctx =
+          canvas.getContext("2d");
+
+        if (ctx) {
+          ctx.clearRect(
+            0,
+            0,
+            window.innerWidth,
+            window.innerHeight,
+          );
+        }
+      }
+
+      const now =
+        performance.now();
+
+      showStartRef.current =
+        now;
+
+      nextLaunchRef.current =
+        now + 150;
+
+      animationRef.current =
+        requestAnimationFrame(
+          animate,
+        );
+    }, [animate]);
+
+  /**
+   * ---------------------------------------------------------
+   * CLICK
+   * ---------------------------------------------------------
+   */
+
+  const handleClick =
+    useCallback(
+      async () => {
+        if (
+          loading ||
+          count === null ||
+          isSubmitting ||
+          isShowRunning
+        ) {
+          return;
+        }
+
+        setIsSubmitting(true);
+        setIsShowRunning(true);
+
+        launchFireworks();
+
+        onLaunch?.();
+
+        try {
+          const res =
+            await fetch(
+              "/api/v1/fireworks",
+              {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                  "Cache-Control":
+                    "no-cache",
+                },
+              },
+            );
+
+          if (!res.ok) {
+            throw new Error(
+              "Failed to increment fireworks",
+            );
+          }
+
+          const data =
+            await res.json();
+
+          setCount(
+            Number(data.count) ||
+              0,
+          );
+        } catch (error) {
+          console.error(
+            "Failed to increment fireworks:",
+            error,
+          );
+
+          setCount(
+            (prev) =>
+              prev ?? 0,
+          );
+        } finally {
+          setIsSubmitting(false);
+        }
+      },
+      [
+        loading,
+        count,
+        isSubmitting,
+        isShowRunning,
+        launchFireworks,
+        onLaunch,
+      ],
+    );
+
+  /**
+   * ---------------------------------------------------------
+   * SSR GUARD
+   * ---------------------------------------------------------
+   */
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <>
-      {/* Fireworks Background */}
-      <div className="pointer-events-none fixed inset-0 z-[9998] overflow-hidden">
-        {fireworks.map((fw) => {
-          const cfg = sizeConfig[fw.size];
-          return (
-            <div key={fw.id} className="absolute bottom-0" style={{ left: `${fw.startX}%` }}>
-              {fw.phase === "launch" ? (
-                <span
-                  className="firework-rocket"
-                  style={{
-                    "--start-x": "0px",
-                    "--end-x": `${fw.endX - fw.startX}vw`,
-                    "--peak": `${fw.peak}vh`,
-                    "--curve": `${fw.curve}vw`,
-                    "--duration": `${cfg.rocketDuration}ms`,
-                    width: `${Math.max(3, cfg.particleSize - 2)}px`,
-                    height: `${cfg.particleSize * 2.5}px`,
-                    backgroundColor: fw.color,
-                    boxShadow: `0 0 ${cfg.particleSize + 4}px 2px ${fw.color}`,
-                  } as React.CSSProperties}
-                />
-              ) : (
-                <div className="absolute" style={{ bottom: `${fw.peak}vh` }}>
-                  {Array.from({ length: cfg.particleCount }).map((_, i) => (
-                    <span
-                      key={i}
-                      className="firework-burst-particle"
-                      style={{
-                        "--angle": `${(360 / cfg.particleCount) * i}deg`,
-                        "--distance": `${fw.particleDistances[i]}px`,
-                        "--duration": `${cfg.burstDuration}ms`,
-                        width: `${cfg.particleSize}px`,
-                        height: `${cfg.particleSize}px`,
-                        backgroundColor: fw.color,
-                        boxShadow: `0 0 ${cfg.particleSize + 4}px ${fw.color}`,
-                      } as React.CSSProperties}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {/* =====================================================
+          CANVAS FIREWORK
+      ====================================================== */}
 
-      {/* Button */}
+      <canvas
+        ref={canvasRef}
+        className="
+          pointer-events-none
+          fixed
+          inset-0
+          z-[10000]
+          h-full
+          w-full
+        "
+        aria-hidden="true"
+      />
+
+      {/* =====================================================
+          BUTTON
+      ====================================================== */}
+
       <div className="relative flex flex-col items-center">
         {!inline && (
-          <span className="mb-1 min-w-[28px] text-center text-xs font-semibold text-white/80">
-            {loading ? "..." : count}
+          <span
+            className="
+              mb-1
+              min-w-[28px]
+              text-center
+              text-xs
+              font-semibold
+              text-white/80
+            "
+          >
+            {loading
+              ? "..."
+              : count ?? 0}
           </span>
         )}
-
-        {particles.map((p) => (
-          <span
-            key={p.id}
-            className="firework-particle"
-            style={{
-              "--angle": `${p.angle}deg`,
-              "--distance": `${p.distance}px`,
-              backgroundColor: p.color,
-              boxShadow: `0 0 8px ${p.color}`,
-            } as React.CSSProperties}
-          />
-        ))}
 
         <button
           type="button"
           onClick={handleClick}
-          disabled={loading || isSubmitting}
+          disabled={
+            loading ||
+            count === null ||
+            isSubmitting ||
+            isShowRunning
+          }
           aria-label="Fireworks"
-          className="group relative flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-slate-900/90 text-white shadow-xl shadow-cyan-500/20 backdrop-blur-xl transition-all duration-200 hover:scale-110 hover:border-cyan-400/40 hover:shadow-cyan-400/40 active:scale-90 disabled:cursor-wait"
+          className="
+            group
+            relative
+            flex
+            h-14
+            w-14
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-white/10
+            bg-slate-900/90
+            text-white
+            shadow-xl
+            shadow-cyan-500/20
+            backdrop-blur-xl
+            transition-all
+            duration-300
+            hover:scale-110
+            hover:border-cyan-400/40
+            hover:shadow-cyan-400/40
+            active:scale-90
+            disabled:cursor-wait
+            disabled:opacity-80
+          "
         >
           <svg
-            className="relative z-10 h-8 w-8 animate-[pulse_1.2s_ease-in-out_infinite] drop-shadow-[0_0_10px_rgba(249,115,22,0.9)] transition-transform group-hover:scale-125"
+            className="
+              relative
+              z-10
+              h-8
+              w-8
+              animate-[pulse_1.2s_ease-in-out_infinite]
+              drop-shadow-[0_0_10px_rgba(249,115,22,0.9)]
+              transition-transform
+              duration-300
+              group-hover:scale-125
+            "
             viewBox="0 0 64 64"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
-              <linearGradient id="fireGradient" x1="32" y1="8" x2="32" y2="58">
-                <stop stopColor="#fde047" />
-                <stop offset="0.45" stopColor="#f97316" />
-                <stop offset="1" stopColor="#dc2626" />
+              <linearGradient
+                id="fireGradient"
+                x1="32"
+                y1="8"
+                x2="32"
+                y2="58"
+              >
+                <stop
+                  stopColor="#fde047"
+                />
+                <stop
+                  offset="0.45"
+                  stopColor="#f97316"
+                />
+                <stop
+                  offset="1"
+                  stopColor="#dc2626"
+                />
               </linearGradient>
             </defs>
+
             <path
-              className="animate-[pulse_0.8s_ease-in-out_infinite]"
-              d="M32 4 C38 15 49 20 49 34 C49 47 41 56 32 56 C19 56 12 47 12 36 C12 25 22 19 27 9 C28 7 30 5 32 4Z"
+              d="
+                M32 4
+                C38 15 49 20 49 34
+                C49 47 41 56 32 56
+                C19 56 12 47 12 36
+                C12 25 22 19 27 9
+                C28 7 30 5 32 4Z
+              "
               fill="url(#fireGradient)"
+              className="
+                animate-[pulse_0.8s_ease-in-out_infinite]
+              "
             />
+
             <path
-              d="M32 22 C36 30 41 33 41 40 C41 47 37 51 32 51 C25 51 22 46 22 41 C22 35 27 31 32 22Z"
+              d="
+                M32 22
+                C36 30 41 33 41 40
+                C41 47 37 51 32 51
+                C25 51 22 46 22 41
+                C22 35 27 31 32 22Z
+              "
               fill="#fff7ed"
-              className="animate-[pulse_0.6s_ease-in-out_infinite]"
+              className="
+                animate-[pulse_0.6s_ease-in-out_infinite]
+              "
             />
           </svg>
         </button>

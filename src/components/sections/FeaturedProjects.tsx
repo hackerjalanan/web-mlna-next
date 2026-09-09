@@ -1,12 +1,12 @@
 import { ArrowUpRight, Code2, ExternalLink } from "lucide-react";
 import { projectService } from "@/services/projects.service";
-import type { Project } from "@/types/projects";
 
 const truncate = (text: string, maxLength = 46) =>
   text.length <= maxLength ? text : text.slice(0, maxLength).trim() + "...";
 
 export default async function FeaturedProjects() {
   const projects = await projectService.getFeaturedProjects(6);
+
   return (
     <section className="px-3 py-4 md:px-3 lg:px-4">
       <div className="mb-6 flex items-end justify-between gap-4">
@@ -19,6 +19,7 @@ export default async function FeaturedProjects() {
           View all →
         </a>
       </div>
+
       <div className="flex gap-3 overflow-x-auto px-1 pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-cyan-400/40">
         {projects.map((project, index) => (
           <article
@@ -31,23 +32,49 @@ export default async function FeaturedProjects() {
             </div>
 
             <h3 className="line-clamp-2 text-[11px] font-semibold leading-4 text-slate-200">{project.title}</h3>
-            <p className="mt-1.5 min-h-[40px] line-clamp-3 text-[9px] leading-4 text-slate-500">{truncate(project.description || "")}</p>
+            <p className="mt-1.5 min-h-[40px] line-clamp-3 text-[9px] leading-4 text-slate-500">
+              {truncate(project.description || "")}
+            </p>
 
             <div className="mt-3 flex gap-2 border-t border-white/5 pt-3">
-              {project.github && (
-                <a href={project.github} className="flex items-center gap-1 text-[8px] text-slate-500 hover:text-slate-300">
+              {project.github ? (
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[8px] text-slate-500 hover:text-slate-300"
+                >
                   <Code2 size={11} />
                   GitHub
                 </a>
+              ) : (
+                <span className="flex cursor-not-allowed items-center gap-1 text-[8px] text-slate-700">
+                  <Code2 size={11} />
+                  GitHub
+                </span>
               )}
-              <a href={project.demo || project.link || "#"} className="flex items-center gap-1 text-[8px] text-slate-500 hover:text-cyan-400">
-                <ExternalLink size={11} />
-                Demo
-              </a>
+
+              {project.demo || project.link ? (
+                <a
+                  href={project.demo || project.link!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[8px] text-slate-500 hover:text-cyan-400"
+                >
+                  <ExternalLink size={11} />
+                  Demo
+                </a>
+              ) : (
+                <span className="flex cursor-not-allowed items-center gap-1 text-[8px] text-slate-700">
+                  <ExternalLink size={11} />
+                  Demo
+                </span>
+              )}
             </div>
           </article>
         ))}
       </div>
+
       <a href="/projects" className="mt-5 inline-block text-xs text-cyan-400 sm:hidden">
         View all projects →
       </a>
