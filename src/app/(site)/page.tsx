@@ -7,6 +7,8 @@ import HowIWork from "@/components/sections/HowIWork";
 import HeroCarousel from "@/components/sections/HeroCarousel";
 import Contact from "@/app/(site)/contact/page";
 
+export const dynamic = "force-dynamic"; 
+
 export default function Home() {
   return (
     <div className="relative isolate overflow-hidden">
