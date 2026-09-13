@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+const RESUME_PATH = "/portofl/CV_Ade_Maulana_Hidayah_Programer-engl.pdf";
+
 export default function ResumePage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
@@ -26,29 +28,19 @@ export default function ResumePage() {
             <h1 className="text-2xl md:text-3xl font-semibold">Resume</h1>
           </div>
 
-          <div className="flex gap-2">
-            {!isMobile && (
-              <button
-                onClick={() => {
-                  const iframe = document.getElementById(
-                    "resume-iframe"
-                  ) as HTMLIFrameElement | null;
-                  iframe?.contentWindow?.print();
-                }}
-                className="px-4 py-2 text-sm rounded-lg bg-[#A855F7] hover:bg-[#9333EA] transition-colors"
-              >
-                Cetak
-              </button>
-            )}
-            <a
-              href="/api/v1/resume"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 text-sm rounded-lg border border-white/15 hover:bg-white/5 transition-colors"
+          {!isMobile && (
+            <button
+              onClick={() => {
+                const iframe = document.getElementById(
+                  "resume-iframe"
+                ) as HTMLIFrameElement | null;
+                iframe?.contentWindow?.print();
+              }}
+              className="px-4 py-2 text-sm rounded-lg bg-[#A855F7] hover:bg-[#9333EA] transition-colors"
             >
-              Buka Tab Baru
-            </a>
-          </div>
+              Cetak
+            </button>
+          )}
         </div>
 
         {isMobile ? (
@@ -57,19 +49,18 @@ export default function ResumePage() {
               Preview PDF tidak didukung di browser mobile.
             </p>
             <a
-              href="/api/v1/resume"
-              target="_blank"
-              rel="noopener noreferrer"
+              href={RESUME_PATH}
+              download="CV_Ade_Maulana_Hidayah.pdf"
               className="inline-block px-5 py-2.5 rounded-lg bg-[#A855F7] hover:bg-[#9333EA] transition-colors text-sm"
             >
-              Buka / Unduh Resume
+              Unduh Resume
             </a>
           </div>
         ) : (
           <div className="rounded-xl border border-white/10 overflow-hidden bg-[#0d0d0d]">
             <iframe
               id="resume-iframe"
-              src="/api/v1/resume"
+              src={RESUME_PATH}
               className="w-full h-[75vh] md:h-[85vh] bg-white"
             />
           </div>
