@@ -26,6 +26,7 @@ export async function GET(req: Request) {
 
   const filePath = path.join(
     process.cwd(),
+    "public",
     "portofl",
     "CV_Ade_Maulana_Hidayah_Programer-engl.pdf"
   );
