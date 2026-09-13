@@ -1,28 +1,28 @@
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-  const referer = req.headers.get("referer") || "";
-  const allowedHost = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const isDev = process.env.NODE_ENV === "development";
+  const allowedHost = "ade-maulana.myid"; // domain production kamu, tanpa https:// dan tanpa trailing slash
 
   if (!isDev) {
-    if (!allowedHost) {
-      console.error(
-        "NEXT_PUBLIC_SITE_URL belum diset di environment variables"
-      );
-      return NextResponse.json(
-        { error: "Server misconfiguration" },
-        { status: 500 }
-      );
+    const referer = req.headers.get("referer") || "";
+
+    let refererHost = "";
+    try {
+      refererHost = new URL(referer).hostname;
+    } catch {
+      refererHost = "";
     }
 
-    if (!referer.includes(allowedHost)) {
+    if (refererHost !== allowedHost) {
+      console.error(
+        `Referer ditolak. Diterima: "${referer}" (host: "${refererHost}"), diharapkan: "${allowedHost}"`
+      );
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
   }
 
   try {
-    // Ambil file langsung dari static asset public/, bukan dari disk server
     const fileUrl = new URL(
       "/portofl/CV_Ade_Maulana_Hidayah_Programer-engl.pdf",
       req.url
