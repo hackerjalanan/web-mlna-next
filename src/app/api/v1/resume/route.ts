@@ -4,12 +4,24 @@ import path from "path";
 
 export async function GET(req: Request) {
   const referer = req.headers.get("referer") || "";
-  const allowedHost = "localhost:3000"; // ganti sesuai domain kamu
+  const allowedHost = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const isDev = process.env.NODE_ENV === "development";
 
   // Lewati pengecekan referer saat development, supaya tidak keblokir di localhost
-  if (!isDev && !referer.includes(allowedHost)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!isDev) {
+    if (!allowedHost) {
+      console.error(
+        "NEXT_PUBLIC_SITE_URL belum diset di environment variables"
+      );
+      return NextResponse.json(
+        { error: "Server misconfiguration" },
+        { status: 500 }
+      );
+    }
+
+    if (!referer.includes(allowedHost)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   const filePath = path.join(
