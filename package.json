@@ -21,6 +21,7 @@
     "@upstash/redis": "^1.38.2",
     "ai": "^6.0.271",
     "docx": "^9.7.1",
+    "fireworks-js": "^2.10.8",
     "framer-motion": "^13.1.1",
     "groq-sdk": "^1.6.0",
     "jspdf": "^4.2.1",

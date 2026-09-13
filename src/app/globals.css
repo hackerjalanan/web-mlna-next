@@ -1,8 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050b14;
-  --foreground: #f8fafc;
+  --background: #050505;
+  --foreground: #f5f5f5;
+
+  /* Accent palette */
+  --purple: #a855f7;
+  --purple-light: #c084fc;
+
+  --blue: #3b82f6;
+  --blue-light: #60a5fa;
+
+  --red: #ef4444;
+  --red-light: #f87171;
+
+  --green: #22c55e;
+  --green-light: #4ade80;
+
+  --border: rgba(255, 255, 255, 0.1);
+  --muted: #a1a1aa;
 }
 
 * {
@@ -16,101 +32,120 @@ html {
 
 body {
   margin: 0;
-  background: var(--background);
+  background: #050505;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* =================================
+   SELECTION
+================================= */
 
 ::selection {
-  background: #22d3ee;
-  color: #050b14;
+  background: rgba(168, 85, 247, 0.35);
+  color: #ffffff;
 }
 
+/* =================================
+   SCROLLBAR
+================================= */
+
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #050b14;
+  background: #050505;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #164e63;
-  border-radius: 999px;
+  background: #27272a;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #22d3ee;
+  background: #52525b;
 }
 
+/* =================================
+   SUBTLE ACCENT UTILITIES
+================================= */
 
+/*
+  Gunakan class ini pada elemen tertentu.
+  Jangan terlalu banyak agar desain tetap profesional.
+*/
+
+.accent-purple {
+  color: var(--purple-light);
+}
+
+.accent-blue {
+  color: var(--blue-light);
+}
+
+.accent-red {
+  color: var(--red-light);
+}
+
+.accent-green {
+  color: var(--green-light);
+}
+
+/* =================================
+   LOGO (warna asli / bawaan gambar)
+================================= */
 .logo-gradient {
-  background: linear-gradient(
-    0deg,
-  #2fff7b 0%,
-  #0ddbff 16%,
-  #3b82f6 32%,
-  #319cdf 48%,
-  #3aff82 64%,
-  #0ddbff 80%,
-  #2fff7b 100%
-  );
-
-
-  background-size: 100% 300%;
-
-  -webkit-mask-image: url("/favicon.svg");
-  mask-image: url("/favicon.svg");
-
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-
-  -webkit-mask-position: center;
-  mask-position: center;
-
-  -webkit-mask-size: contain;
-  mask-size: contain;
-
-  animation: logo-gradient-flow 4s linear infinite;
+  background-image: url("/favicon.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 100%;
+  /* sesuaikan ukuran sesuai kebutuhan */
+  height: 100%;
 }
 
-@keyframes logo-gradient-flow {
-  from {
-    background-position: 50% 0%;
-  }
-
-  to {
-    background-position: 50% 100%;
-  }
-}
-/* ================================
+/* =================================
    FIREWORK BUTTON PARTICLE
-================================ */
+================================= */
 
 .firework-particle {
   position: absolute;
   left: 50%;
   top: 50%;
+
   width: 5px;
   height: 5px;
+
   border-radius: 9999px;
+
   pointer-events: none;
   z-index: 10001;
 
   transform: translate(-50%, -50%);
 
-  animation: firework-particle-explode 800ms
-    cubic-bezier(0.15, 0.8, 0.35, 1) forwards;
+  animation:
+    firework-particle-explode 800ms cubic-bezier(0.15, 0.8, 0.35, 1) forwards;
 }
 
 @keyframes firework-particle-explode {
   0% {
     opacity: 1;
+
     transform:
-      translate(-50%, -50%)
-      rotate(var(--angle))
-      translateX(0)
-      scale(1);
+      translate(-50%, -50%) rotate(var(--angle)) translateX(0) scale(1);
   }
 
   60% {
@@ -119,21 +154,19 @@ body {
 
   100% {
     opacity: 0;
+
     transform:
-      translate(-50%, -50%)
-      rotate(var(--angle))
-      translateX(var(--distance))
-      scale(0);
+      translate(-50%, -50%) rotate(var(--angle)) translateX(var(--distance)) scale(0);
   }
 }
 
-
-/* ================================
+/* =================================
    FIREWORK ROCKET
-================================ */
+================================= */
 
 .firework-rocket {
   position: absolute;
+
   left: 0;
   bottom: 0;
 
@@ -142,14 +175,10 @@ body {
   border-radius: 9999px;
 
   pointer-events: none;
-
   z-index: 10001;
 
   animation:
-    firework-rocket-launch
-    var(--duration)
-    cubic-bezier(0.2, 0.8, 0.3, 1)
-    forwards;
+    firework-rocket-launch var(--duration) cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
 }
 
 @keyframes firework-rocket-launch {
@@ -157,11 +186,9 @@ body {
     opacity: 0;
 
     transform:
-      translate3d(
-        var(--start-x),
+      translate3d(var(--start-x),
         0,
-        0
-      );
+        0);
   }
 
   10% {
@@ -172,18 +199,15 @@ body {
     opacity: 1;
 
     transform:
-      translate3d(
-        var(--end-x),
+      translate3d(var(--end-x),
         calc(var(--peak) * -1),
-        0
-      );
+        0);
   }
 }
 
-
-/* ================================
-   FIREWORK BURST PARTICLE
-================================ */
+/* =================================
+   FIREWORK BURST
+================================= */
 
 .firework-burst-particle {
   position: absolute;
@@ -196,19 +220,13 @@ body {
   border-radius: 9999px;
 
   pointer-events: none;
-
   z-index: 10001;
 
   transform:
-    translate(-50%, -50%)
-    rotate(var(--angle))
-    translateX(0);
+    translate(-50%, -50%) rotate(var(--angle)) translateX(0);
 
   animation:
-    firework-burst
-    var(--duration)
-    cubic-bezier(0.15, 0.8, 0.3, 1)
-    forwards;
+    firework-burst var(--duration) cubic-bezier(0.15, 0.8, 0.3, 1) forwards;
 }
 
 @keyframes firework-burst {
@@ -216,10 +234,7 @@ body {
     opacity: 1;
 
     transform:
-      translate(-50%, -50%)
-      rotate(var(--angle))
-      translateX(0)
-      scale(1);
+      translate(-50%, -50%) rotate(var(--angle)) translateX(0) scale(1);
   }
 
   50% {
@@ -230,12 +245,14 @@ body {
     opacity: 0;
 
     transform:
-      translate(-50%, -50%)
-      rotate(var(--angle))
-      translateX(var(--distance))
-      scale(0);
+      translate(-50%, -50%) rotate(var(--angle)) translateX(var(--distance)) scale(0);
   }
 }
+
+/* =================================
+   FADE IN
+================================= */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -248,11 +265,32 @@ body {
   }
 }
 
+/* =================================
+   BREADCRUMB
+================================= */
 
 .breadcrumb {
   position: fixed;
+
   top: 0;
   left: 0;
   right: 0;
+
   z-index: 1000;
+}
+
+/* =================================
+   REDUCED MOTION
+================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,50 +1,19 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
-
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import Image from "next/image";
 import { useLoading } from "@/context/LoadingContext";
 import { menuItems } from "./MenuItems";
 import { cinzel } from "@/lib/fonts";
 
-
-interface NavbarProps {
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-}
-
-export default function Navbar({ open, setOpen }: NavbarProps) {
+export default function Navbar() {
   const [activeItem, setActiveItem] = useState("/");
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const { navigate } = useLoading();
-
-  // =====================================================
-  // TABLET SIDEBAR BEHAVIOR
-  // =====================================================
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(
-      "(min-width: 768px) and (max-width: 1023px)"
-    );
-
-    const handleTablet = (e: MediaQueryListEvent | MediaQueryList) => {
-      if (e.matches) {
-        setOpen(false);
-      } else {
-        setOpen(true);
-      }
-    };
-
-    handleTablet(mediaQuery);
-
-    mediaQuery.addEventListener("change", handleTablet);
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleTablet);
-    };
-  }, [setOpen]);
 
   // =====================================================
   // ACTIVE MENU
@@ -54,18 +23,10 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
       item.href.startsWith("#")
     );
 
-    // Tidak ada section menu
-    if (sectionItems.length === 0) {
-      setActiveItem(window.location.pathname);
-      return;
-    }
-
     const handleScroll = () => {
       const currentPath = window.location.pathname;
 
-      // -------------------------------------------------
-      // ROUTE / NORMAL PAGE
-      // -------------------------------------------------
+      // Route selain homepage
       if (currentPath !== "/") {
         const currentRoute = menuItems.find(
           (item) =>
@@ -78,21 +39,25 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
         return;
       }
 
-      // -------------------------------------------------
-      // HOME PAGE + SECTION
-      // -------------------------------------------------
+      // Homepage tanpa section
+      if (sectionItems.length === 0) {
+        setActiveItem("/");
+        return;
+      }
+
+      // Deteksi section aktif
       let currentSection = "/";
 
       sectionItems.forEach((item) => {
-        const sectionId = item.href.replace("#", "");
+        const sectionId = item.href.slice(1);
         const section = document.getElementById(sectionId);
 
-        if (section) {
-          const rect = section.getBoundingClientRect();
+        if (!section) return;
 
-          if (rect.top <= window.innerHeight * 0.35) {
-            currentSection = item.href;
-          }
+        const { top } = section.getBoundingClientRect();
+
+        if (top <= window.innerHeight * 0.35) {
+          currentSection = item.href;
         }
       });
 
@@ -101,7 +66,9 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
 
     handleScroll();
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -109,32 +76,42 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
   }, []);
 
   // =====================================================
-  // HANDLE MENU CLICK
+  // LOCK BODY SCROLL
+  // =====================================================
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  // =====================================================
+  // MENU CLICK
   // =====================================================
   const handleMenuClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
     setActiveItem(href);
+    setMobileOpen(false);
 
-    // Kalau anchor section (mis. "#tentang")
+    // Anchor / section
     if (href.startsWith("#")) {
       e.preventDefault();
-      const sectionId = href.replace("#", "");
+
+      const sectionId = href.slice(1);
       const section = document.getElementById(sectionId);
 
-      if (section) {
-        section.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
+      section?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+
       return;
     }
 
-    // Route biasa (mis. "/admin", "/projects")
-    // Cegah full page reload, pakai client-side navigation
-    // supaya Navbar & MainLayout tidak ikut unmount
+    // Route
     e.preventDefault();
     navigate(href);
   };
@@ -144,149 +121,260 @@ export default function Navbar({ open, setOpen }: NavbarProps) {
   // =====================================================
   const getActiveClass = (href: string) => {
     return activeItem === href
-      ? "bg-cyan-500/10 text-cyan-400"
-      : "text-slate-300 hover:bg-slate-800 hover:text-cyan-400";
+      ? "text-white"
+      : "text-white/50 hover:text-white";
   };
 
-  return (
-    <>
-      {/* =====================================================
-          DESKTOP
-          lg ke atas
-      ====================================================== */}
+  // =====================================================
+  // LOGO
+  // =====================================================
+  const Logo = () => (
+    <Link
+      href="/"
+      onClick={(e) => handleMenuClick(e, "/")}
+      className="flex items-center gap-2"
+      aria-label="AD.EM Home"
+    >
+      <Image
+        src="/favicon.svg"
+        alt=""
+        width={40}
+        height={36}
+        className="h-9 w-10"
+        aria-hidden="true"
+      />
 
-      <aside
-        className={`fixed left-0 top-0 z-50 hidden min-h-screen bg-slate-900 p-4 text-white transition-all duration-300 md:block ${
-          open ? "w-60" : "w-20"
-        }`}
+      <span
+        className={`${cinzel.className} text-xl font-medium leading-none tracking-[0.08em] text-white`}
       >
-        {/* =====================================================
-            HEADER
-        ===================================================== */}
+        AD<span className="text-[#8B5CF6]">.</span>EM
+      </span>
+    </Link>
+  );
 
-        <div className="group relative mb-10 flex h-10 items-center">
-          {/* LOGO + TEXT */}
-          <div
-            className={`flex h-10  items-center transition-all duration-300 ${
-              open ? "ml-2 gap-2" : "w-full justify-center"
-            }`}
-          >
-            <div
-              className={`logo-gradient ${
-                open ? "ml-8 h-10 w-12" : "h-10 w-14"
-              }`}
-              aria-label="AD.EM Logo"
-            />
+  return (
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050505]/90 backdrop-blur-xl">
+      {/* =================================================
+          NAVBAR
+      ================================================= */}
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-10">
+        {/* Logo */}
+        <Logo />
 
-            {open && (
-             <span
-                className={`${cinzel.className} relative top-1 whitespace-nowrap text-2xl font-medium-bold leading-none tracking-[0.08em] text-white`}
-              >
-                AD<span className="text-cyan-400">.</span>EM
-              </span>
-            )}
-          </div>
-
-          {/* TOGGLE */}
-          <button
-            onClick={() => setOpen(!open)}
-            className={`absolute flex h-10 w-10 items-center justify-center rounded-lg text-slate-300 transition-all duration-200 hover:bg-slate-800 hover:text-white ${
-              open
-                ? "left-0"
-                : "left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100"
-            }`}
-            aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            ☰
-          </button>
-        </div>
-
-        {/* =====================================================
-            MENU
-        ===================================================== */}
-
-        <nav className="space-y-2">
+        {/* =================================================
+            DESKTOP / TABLET
+        ================================================= */}
+        <nav
+          className="hidden items-center gap-8 md:flex"
+          aria-label="Primary navigation"
+        >
           {menuItems.map((item) => (
-            <a
+            <Link
               key={item.name}
               href={item.href}
-              title={item.name}
               onClick={(e) => handleMenuClick(e, item.href)}
-              className={`flex items-center rounded-lg px-3 py-3 transition-all duration-200 ${getActiveClass(
+              className={`relative py-2 text-sm font-medium transition-colors ${getActiveClass(
                 item.href
-              )} ${open ? "gap-3" : "justify-center"}`}
+              )}`}
             >
-              {/* ICON */}
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center">
-                {item.icon}
-              </span>
+              {item.name}
 
-              {/* NAME */}
-              {open && (
-                <span className="whitespace-nowrap text-sm font-medium">
-                  {item.name}
-                </span>
+              {activeItem === item.href && (
+                <motion.span
+                  layoutId="navbar-active"
+                  className="absolute -bottom-[1px] left-0 h-px w-full bg-[#8B5CF6]"
+                  aria-hidden="true"
+                />
               )}
-            </a>
+            </Link>
           ))}
         </nav>
-      </aside>
 
-      {/* =====================================================
-          MOBILE HEADER
-      ====================================================== */}
-
-      <div className="left-0 top-0 z-40 flex h-11 w-full items-center justify-center border-b border-white/10 bg-slate-900/95 backdrop-blur-xl md:hidden">
-        <div
-          className={`logo-gradient ${open ? "h-12 w-11" : "h-12 w-11"}`}
-          aria-label="AD.EM Logo"
-        />
-
-        <h1 className={`${cinzel.className} text-3xl font-medium-bold relative top-1 leading-none tracking-[0.08em] text-white`}> AD.EM</h1>
+        {/* =================================================
+            MOBILE BUTTON
+        ================================================= */}
+        <button
+          type="button"
+          onClick={() => setMobileOpen((open) => !open)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          className="relative z-[70] flex h-9 w-9 items-center justify-center text-white transition-colors hover:text-[#8B5CF6] md:hidden"
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            {mobileOpen ? (
+              <motion.div
+                key="close"
+                initial={{ opacity: 0, rotate: -90, scale: 0.8 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, rotate: 90, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X size={22} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="menu"
+                initial={{ opacity: 0, rotate: 90, scale: 0.8 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, rotate: -90, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Menu size={22} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </button>
       </div>
 
-      {/* =====================================================
-          MOBILE BOTTOM NAVIGATION
-      ====================================================== */}
+      {/* =================================================
+          MOBILE SIDE DRAWER
+      ================================================= */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            {/* ---------------------------------------------
+                BACKDROP
+            --------------------------------------------- */}
+            <motion.button
+              type="button"
+              aria-label="Close mobile menu"
+              onClick={() => setMobileOpen(false)}
+              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px] md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            />
 
-      <nav
-        className="
-          fixed bottom-0 left-0 z-50
-          grid w-full
-          border-t border-white/10
-          bg-slate-900/95
-          px-2 py-2
-          text-white
-          backdrop-blur-xl
-          md:hidden
-        "
-        style={{
-          gridTemplateColumns: `repeat(${menuItems.length}, minmax(0, 1fr))`,
-        }}
-      >
-        {menuItems.map((item) => (
-          <a
-            key={item.name}
-            href={item.href}
-            title={item.name}
-            onClick={(e) => handleMenuClick(e, item.href)}
-            className={`
-              flex flex-col
-              items-center justify-center
-              gap-1 rounded-xl py-2
-              transition-all duration-200
-              active:scale-95
-              ${getActiveClass(item.href)}
-            `}
-          >
-            <span className="flex h-6 w-6 items-center justify-center">
-              {item.icon}
-            </span>
+            {/* ---------------------------------------------
+                SIDE PANEL
+                50% SCREEN
+            --------------------------------------------- */}
+            <motion.aside
+              className="
+                fixed
+                right-0
+                top-0
+                z-50
+                flex
+                h-dvh
+                w-1/2
+                min-w-[240px]
+                max-w-[420px]
+                flex-col
+                border-l
+                border-white/10
+                bg-[#050505]
+                shadow-[-20px_0_60px_rgba(0,0,0,0.45)]
+                md:hidden
+              "
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{
+                duration: 0.35,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              {/* -------------------------------------------
+                  PANEL HEADER
+              ------------------------------------------- */}
+              <div className="flex h-16 shrink-0 items-center border-b border-white/10 px-5">
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/30">
+                   {"AD </> EM"}
+                </span>
+              </div>
 
-            <span className="text-[10px] font-medium">{item.name}</span>
-          </a>
-        ))}
-      </nav>
-    </>
+              {/* -------------------------------------------
+                  MENU
+              ------------------------------------------- */}
+              <nav
+                className="flex flex-1 flex-col px-4 py-6"
+                aria-label="Mobile navigation"
+              >
+                {menuItems.map((item, index) => {
+                  const isActive = activeItem === item.href;
+
+                  return (
+                    <motion.div
+                      key={item.name}
+                      initial={{
+                        opacity: 0,
+                        x: 20,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                      }}
+                      transition={{
+                        duration: 0.3,
+                        delay: 0.08 + index * 0.05,
+                      }}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={(e) =>
+                          handleMenuClick(e, item.href)
+                        }
+                        className={`
+                          group
+                          relative
+                          flex
+                          items-center
+                          justify-between
+                          border-b
+                          border-white/[0.06]
+                          px-2
+                          py-4
+                          text-sm
+                          font-medium
+                          transition-all
+                          duration-200
+                          ${
+                            isActive
+                              ? "text-white"
+                              : "text-white/45 hover:text-white"
+                          }
+                        `}
+                      >
+                        <span>{item.name}</span>
+
+                        <span
+                          className={`
+                            h-1.5
+                            w-1.5
+                            rounded-full
+                            transition-all
+                            duration-200
+                            ${
+                              isActive
+                                ? "bg-[#8B5CF6] shadow-[0_0_10px_rgba(139,92,246,0.7)]"
+                                : "bg-white/10 group-hover:bg-white/40"
+                            }
+                          `}
+                        />
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </nav>
+
+              {/* -------------------------------------------
+                  PANEL FOOTER
+              ------------------------------------------- */}
+              <div className="border-t border-white/10 px-6 py-5">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/25">
+                  AD.EM / Portfolio
+                </p>
+
+                <p className="mt-2 text-xs leading-5 text-white/35">
+                  Fullstack Programmer
+                </p>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </header>
   );
 }

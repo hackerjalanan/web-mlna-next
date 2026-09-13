@@ -6,8 +6,8 @@ import type { GalleryItem } from "@/types/gallery";
 import Link from "next/link";
 import { Upload } from "lucide-react";
 
-import GalleryFilterBar from "../../components/GalleryFilterBar";
-import GalleryGrid from "../../components/GalleryGrid";
+import GalleryFilterBar from "../../../../components/admin/GalleryFilterBar";
+import GalleryGrid from "../../../../components/admin/GalleryGrid";
 
 export default function Gallery() {
   const router = useRouter();
