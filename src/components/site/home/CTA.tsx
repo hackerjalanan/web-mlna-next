@@ -31,9 +31,9 @@ const NAV_LINKS = [
 const STACK = ["Laravel", "Next.js", "React", "Node.js / Express", "MySQL", "Tailwind CSS"];
 
 const RESOURCES = [
-  { label: "Resume / CV", href: "/resume.pdf" },
+  { label: "Resume / CV", href: "/resume" },
   { label: "Blog", href: "/projects", isNew: true },
-  { label: "Uses", href: "/uses" },
+  { label: "Guide", href: "/guide" },
 ];
 
 const SOCIALS = [
