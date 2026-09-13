@@ -7,7 +7,6 @@ import BackendShowcase from "@/components/site/home/BackendShowcase";
 import Services from "@/components/site/home/Services";
 import Process from "@/components/site/home/Process";
 import CTA from "@/components/site/home/CTA";
-import Contact from "@/app/(site)/contact/page";
 
 export const dynamic = "force-dynamic";
 
