@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { readFile } from "fs/promises";
-import path from "path";
 
 export async function GET(req: Request) {
   const referer = req.headers.get("referer") || "";
   const allowedHost = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const isDev = process.env.NODE_ENV === "development";
 
-  // Lewati pengecekan referer saat development, supaya tidak keblokir di localhost
   if (!isDev) {
     if (!allowedHost) {
       console.error(
@@ -24,15 +21,19 @@ export async function GET(req: Request) {
     }
   }
 
-  const filePath = path.join(
-    process.cwd(),
-    "public",
-    "portofl",
-    "CV_Ade_Maulana_Hidayah_Programer-engl.pdf"
-  );
-
   try {
-    const fileBuffer = await readFile(filePath);
+    // Ambil file langsung dari static asset public/, bukan dari disk server
+    const fileUrl = new URL(
+      "/portofl/CV_Ade_Maulana_Hidayah_Programer-engl.pdf",
+      req.url
+    );
+    const fileRes = await fetch(fileUrl);
+
+    if (!fileRes.ok) {
+      throw new Error(`Gagal fetch file: ${fileRes.status}`);
+    }
+
+    const fileBuffer = await fileRes.arrayBuffer();
 
     return new NextResponse(fileBuffer, {
       status: 200,
