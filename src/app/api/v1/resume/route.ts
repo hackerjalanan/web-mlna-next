@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const isDev = process.env.NODE_ENV === "development";
-  const allowedHost = "ade-maulana.myid"; // domain production kamu, tanpa https:// dan tanpa trailing slash
+  const allowedHost = "www.ade-maulana.my.id"; // domain production kamu, tanpa https:// dan tanpa trailing slash
 
   if (!isDev) {
     const referer = req.headers.get("referer") || "";
