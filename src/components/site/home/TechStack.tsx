@@ -55,21 +55,32 @@ export default function TechStack() {
         </p>
       </motion.div>
 
-      <div className="mt-16 grid grid-cols-1 divide-y divide-white/[0.07] sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
+      <div className="mt-16 grid grid-cols-2 lg:grid-cols-4">
         {groups.map((group, groupIndex) => (
           <motion.div
             key={group.title}
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.45, delay: groupIndex * 0.08, ease: "easeOut" }}
-            className="
-              group relative py-6 sm:py-0
-              sm:border-l sm:border-white/[0.07] sm:pl-6
-              first:sm:border-l-0 first:sm:pl-0
-            "
+            transition={{
+              duration: 0.45,
+              delay: groupIndex * 0.08,
+              ease: "easeOut",
+            }}
+            className={`
+              group relative py-6
+              px-4
+              border-white/[0.07]
+              ${groupIndex % 2 !== 0 ? "border-l" : ""}
+              ${groupIndex >= 2 ? "border-t" : ""}
+              lg:border-t-0
+              lg:border-l
+              lg:py-0
+              lg:px-6
+              ${groupIndex === 0 ? "lg:border-l-0 lg:pl-0" : ""}
+            `}
           >
-            {/* Icon — subtle idle float, tanpa background/box */}
+            {/* Icon */}
             <motion.div
               animate={{ y: [0, -3, 0] }}
               transition={{
@@ -80,10 +91,16 @@ export default function TechStack() {
               }}
               className="inline-flex"
             >
-              <group.icon size={20} style={{ color: group.color }} strokeWidth={1.75} />
+              <group.icon
+                size={20}
+                style={{ color: group.color }}
+                strokeWidth={1.75}
+              />
             </motion.div>
 
-            <h3 className="mt-4 text-sm font-semibold text-white">{group.title}</h3>
+            <h3 className="mt-4 text-sm font-semibold text-white">
+              {group.title}
+            </h3>
 
             <ul className="mt-4 space-y-2.5">
               {group.items.map((item, itemIndex) => (
@@ -94,12 +111,21 @@ export default function TechStack() {
                   viewport={{ once: true, margin: "-80px" }}
                   transition={{
                     duration: 0.3,
-                    delay: groupIndex * 0.08 + itemIndex * 0.05 + 0.15,
+                    delay:
+                      groupIndex * 0.08 +
+                      itemIndex * 0.05 +
+                      0.15,
                   }}
                   className="text-sm text-white/50 transition-colors duration-200"
-                  style={{ ["--hover-color" as string]: group.color }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = group.color)}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "")}
+                  style={{
+                    ["--hover-color" as string]: group.color,
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = group.color)
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "")
+                  }
                 >
                   {item}
                 </motion.li>

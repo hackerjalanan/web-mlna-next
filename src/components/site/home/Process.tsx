@@ -68,26 +68,41 @@ export default function Process() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           {steps.map((step, index) => {
             const Icon = step.icon;
+
             return (
               <motion.div
                 key={step.number}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.45, delay: index * 0.1, ease: "easeOut" }}
-                className="group relative"
+                transition={{
+                  duration: 0.45,
+                  delay: index * 0.1,
+                  ease: "easeOut",
+                }}
+                className="group relative flex flex-col items-center text-center lg:items-start lg:text-left"
               >
-                {/* Icon marker — duduk di atas connecting line */}
+                {/* Icon marker */}
                 <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[#050505] transition-transform duration-300 group-hover:-translate-y-0.5">
-                  <Icon size={18} style={{ color: step.color }} strokeWidth={1.75} />
+                  <Icon
+                    size={18}
+                    style={{ color: step.color }}
+                    strokeWidth={1.75}
+                  />
                 </div>
 
                 <div className="mt-5">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-xs text-white/30">{step.number}</span>
-                    <h3 className="text-base font-semibold text-white">{step.title}</h3>
+                  <div className="flex items-baseline justify-center gap-2 lg:justify-start">
+                    <span className="font-mono text-xs text-white/30">
+                      {step.number}
+                    </span>
+
+                    <h3 className="text-base font-semibold text-white">
+                      {step.title}
+                    </h3>
                   </div>
-                  <p className="mt-2 max-w-[26ch] text-sm leading-6 text-white/50">
+
+                  <p className="mx-auto mt-2 max-w-[26ch] text-sm leading-6 text-white/50 lg:mx-0">
                     {step.text}
                   </p>
                 </div>

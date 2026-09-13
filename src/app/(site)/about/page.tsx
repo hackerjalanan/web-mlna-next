@@ -1,4 +1,5 @@
 "use client";
+
 import TechBlocks from "@/components/site/about/TechBlocks";
 
 import Image from "next/image";
@@ -9,6 +10,8 @@ import {
   Palette,
   BriefcaseBusiness,
 } from "lucide-react";
+
+
 import {
   SiJavascript,
   SiTypescript,
@@ -33,6 +36,7 @@ import {
   SiPostman,
   SiFigma,
 } from "react-icons/si";
+
 import {
   motion,
   useMotionTemplate,
@@ -41,10 +45,16 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { useEffect, useRef, type PointerEvent, type ReactNode } from "react";
+
+import {
+  useEffect,
+  useRef,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
 
 // =====================================================
-// DATA (tidak diubah, hanya struktur tampilan)
+// DATA
 // =====================================================
 
 const skills = [
@@ -121,7 +131,7 @@ const experiences = [
 ];
 
 // =====================================================
-// SHARED: scroll-reveal wrapper (fade + slide up)
+// SHARED: SCROLL REVEAL
 // =====================================================
 
 function Reveal({
@@ -138,7 +148,11 @@ function Reveal({
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      transition={{
+        duration: 0.5,
+        delay,
+        ease: "easeOut",
+      }}
       className={className}
     >
       {children}
@@ -147,9 +161,8 @@ function Reveal({
 }
 
 // =====================================================
-// SHARED: tilt card — distorsi 3D halus saat hover
+// SHARED: TILT CARD
 // =====================================================
-
 function TiltCard({
   children,
   accent,
@@ -163,25 +176,97 @@ function TiltCard({
 
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
+
   const glowX = useMotionValue(0);
   const glowY = useMotionValue(0);
 
-  const springConfig = { stiffness: 220, damping: 22, mass: 0.5 };
-  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [6, -6]), springConfig);
-  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-6, 6]), springConfig);
+  const springConfig = {
+    stiffness: 220,
+    damping: 22,
+    mass: 0.5,
+  };
 
-  const highlight = useMotionTemplate`radial-gradient(200px circle at ${glowX}px ${glowY}px, ${accent}1F, transparent 75%)`;
+  // =========================
+  // 3D TILT
+  // =========================
 
-  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion || e.pointerType === "touch") return;
-    const rect = e.currentTarget.getBoundingClientRect();
+  const rotateX = useSpring(
+    useTransform(
+      pointerY,
+      [-0.5, 0.5],
+      [6, -6]
+    ),
+    springConfig
+  );
+
+  const rotateY = useSpring(
+    useTransform(
+      pointerX,
+      [-0.5, 0.5],
+      [-6, 6]
+    ),
+    springConfig
+  );
+
+  // =========================
+  // CURSOR RGB
+  // =========================
+
+  const rgbGlow = useMotionTemplate`
+    radial-gradient(
+      180px circle at ${glowX}px ${glowY}px,
+      rgba(139, 92, 246, 0.95),
+      rgba(59, 130, 246, 0.55) 32%,
+      rgba(239, 68, 68, 0.45) 52%,
+      transparent 75%
+    )
+  `;
+
+  const cursorGlow = useMotionTemplate`
+    radial-gradient(
+      120px circle at ${glowX}px ${glowY}px,
+      rgba(139, 92, 246, 0.18),
+      rgba(59, 130, 246, 0.10) 35%,
+      rgba(239, 68, 68, 0.06) 55%,
+      transparent 75%
+    )
+  `;
+
+  // =========================
+  // POINTER MOVE
+  // =========================
+
+  const handlePointerMove = (
+    e: PointerEvent<HTMLDivElement>
+  ) => {
+    if (
+      prefersReducedMotion ||
+      e.pointerType === "touch"
+    ) {
+      return;
+    }
+
+    const rect =
+      e.currentTarget.getBoundingClientRect();
+
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    pointerX.set(x / rect.width - 0.5);
-    pointerY.set(y / rect.height - 0.5);
+
+    pointerX.set(
+      x / rect.width - 0.5
+    );
+
+    pointerY.set(
+      y / rect.height - 0.5
+    );
+
     glowX.set(x);
     glowY.set(y);
   };
+
+  // =========================
+  // POINTER LEAVE
+  // =========================
 
   const handlePointerLeave = () => {
     pointerX.set(0);
@@ -190,110 +275,316 @@ function TiltCard({
 
   return (
     <motion.div
+      className={`group relative ${className ?? ""}`}
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 900,
+      }}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      style={{ rotateX, rotateY, transformPerspective: 800 }}
-      className={className}
     >
-      <div className="relative h-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] transition-colors hover:border-white/20">
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 hover:opacity-100"
-          style={{ background: highlight }}
-        />
-        <div className="relative z-10 h-full">{children}</div>
+      {/* RGB BORDER */}
+      <motion.div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          -inset-px
+          z-0
+          rounded-[inherit]
+          opacity-0
+          transition-opacity
+          duration-300
+          group-hover:opacity-100
+        "
+        style={{
+          background: rgbGlow,
+        }}
+      />
+
+      {/* BLACK INNER SURFACE */}
+      <div
+        className="
+          absolute
+          inset-px
+          z-[1]
+          rounded-[inherit]
+          bg-[#050505]
+        "
+      />
+
+      {/* CURSOR DISTORTION / GLOW */}
+      <motion.div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          z-[2]
+          rounded-[inherit]
+          opacity-0
+          blur-xl
+          transition-opacity
+          duration-300
+          group-hover:opacity-100
+        "
+        style={{
+          background: cursorGlow,
+        }}
+      />
+
+      {/* CONTENT */}
+      <div className="relative z-10">
+        {children}
       </div>
     </motion.div>
   );
 }
 
 // =====================================================
-// DOTTED BRAND MARK — "AD.EM" tersusun dari titik-titik,
-// diambil dari alpha channel teks yang digambar di canvas
-// offscreen. Highlight lembut mengikuti kursor (blend
-// overlay) untuk efek terang-gelap seperti referensi.
+// DOTTED BRAND MARK
 // =====================================================
 
 function DottedBrandMark() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const prefersReducedMotion = useReducedMotion();
 
   const glowX = useMotionValue(0);
   const glowY = useMotionValue(0);
-  const glow = useMotionTemplate`radial-gradient(320px circle at ${glowX}px ${glowY}px, rgba(255,255,255,0.35), transparent 70%)`;
+
+  const glow = useMotionTemplate`
+    radial-gradient(
+      320px circle at ${glowX}px ${glowY}px,
+      rgba(255,255,255,0.35),
+      transparent 70%
+    )
+  `;
 
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
+
     if (!container || !canvas) return;
+
     const ctx = canvas.getContext("2d");
+
     if (!ctx) return;
 
+    let resizeObserver: ResizeObserver | null = null;
+    let cancelled = false;
+
     const draw = () => {
+      if (cancelled) return;
+
       const rect = container.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
 
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
+      if (rect.width <= 0 || rect.height <= 0) {
+        return;
+      }
+
+      // =================================================
+      // Gunakan ukuran integer agar koordinat canvas
+      // konsisten dan tidak menyebabkan flicker.
+      // =================================================
+
+      const width = Math.round(rect.width);
+      const height = Math.round(rect.height);
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, rect.width, rect.height);
+      ctx.clearRect(0, 0, width, height);
 
-      // Canvas offscreen — dipakai hanya untuk membaca area huruf "AD.EM"
+      // =================================================
+      // OFFSCREEN CANVAS
+      // =================================================
+
       const off = document.createElement("canvas");
-      off.width = rect.width;
-      off.height = rect.height;
-      const offCtx = off.getContext("2d");
+
+      off.width = width;
+      off.height = height;
+
+      const offCtx = off.getContext("2d", {
+        willReadFrequently: true,
+      });
+
       if (!offCtx) return;
+
+      offCtx.clearRect(0, 0, width, height);
 
       offCtx.textAlign = "center";
       offCtx.textBaseline = "middle";
-      offCtx.fillStyle = "#fff";
+      offCtx.fillStyle = "#ffffff";
 
-      let fontSize = rect.height * 0.5;
+      // =================================================
+      // FONT SIZE STABIL
+      // =================================================
+
+      const maxWidth = width * 0.8;
+      const maxHeight = height * 0.55;
+
+      let fontSize = Math.min(
+        height * 0.5,
+        maxHeight
+      );
+
       const setFont = (size: number) => {
         offCtx.font = `600 ${size}px "Cinzel", serif`;
       };
 
       setFont(fontSize);
-      const maxWidth = rect.width * 0.8;
+
       let textWidth = offCtx.measureText("AD.EM").width;
-      if (textWidth > maxWidth) {
-        fontSize *= maxWidth / textWidth;
+
+      // Scale hanya sekali berdasarkan ukuran final.
+      if (textWidth > maxWidth && textWidth > 0) {
+        fontSize = fontSize * (maxWidth / textWidth);
         setFont(fontSize);
       }
 
-      offCtx.fillText("AD.EM", rect.width / 2, rect.height / 2);
-      const { data } = offCtx.getImageData(0, 0, rect.width, rect.height);
+      // Safety check kedua untuk font yang sangat berbeda
+      // ketika fallback font digunakan.
+      textWidth = offCtx.measureText("AD.EM").width;
+
+      if (textWidth > maxWidth && textWidth > 0) {
+        fontSize = fontSize * (maxWidth / textWidth);
+        setFont(fontSize);
+      }
+
+      // =================================================
+      // DRAW TEXT
+      // =================================================
+
+      offCtx.fillText(
+        "AD.EM",
+        width / 2,
+        height / 2
+      );
+
+      // =================================================
+      // READ PIXELS
+      // =================================================
+
+      const imageData = offCtx.getImageData(
+        0,
+        0,
+        width,
+        height
+      );
+
+      const data = imageData.data;
+
+      // =================================================
+      // DOT SETTINGS
+      // =================================================
 
       const spacing = 5;
       const dotRadius = 0.9;
+
       ctx.fillStyle = "rgba(255,255,255,0.18)";
 
-      for (let y = 0; y < rect.height; y += spacing) {
-        for (let x = 0; x < rect.width; x += spacing) {
-          const idx = (Math.floor(y) * rect.width + Math.floor(x)) * 4;
-          if (data[idx + 3] > 128) {
+      // =================================================
+      // BUILD DOTS
+      // =================================================
+
+      for (let y = 0; y < height; y += spacing) {
+        for (let x = 0; x < width; x += spacing) {
+          const pixelX = Math.min(
+            Math.floor(x),
+            width - 1
+          );
+
+          const pixelY = Math.min(
+            Math.floor(y),
+            height - 1
+          );
+
+          const idx =
+            (pixelY * width + pixelX) * 4;
+
+          const alpha = data[idx + 3];
+
+          if (alpha > 128) {
             ctx.beginPath();
-            ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+
+            ctx.arc(
+              x,
+              y,
+              dotRadius,
+              0,
+              Math.PI * 2
+            );
+
             ctx.fill();
           }
         }
       }
     };
 
-    draw();
-    const observer = new ResizeObserver(draw);
-    observer.observe(container);
-    return () => observer.disconnect();
+    // ===================================================
+    // IMPORTANT:
+    // Tunggu font selesai dimuat sebelum melakukan
+    // measureText().
+    // Ini bagian utama untuk menghilangkan flicker.
+    // ===================================================
+
+    const initialize = async () => {
+      try {
+        if (document.fonts?.ready) {
+          await document.fonts.ready;
+        }
+      } catch {
+        // fallback tetap lanjut
+      }
+
+      if (cancelled) return;
+
+      draw();
+
+      resizeObserver = new ResizeObserver(() => {
+        draw();
+      });
+
+      resizeObserver.observe(container);
+    };
+
+    initialize();
+
+    return () => {
+      cancelled = true;
+
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
   }, []);
 
-  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    const rect = e.currentTarget.getBoundingClientRect();
+  // =====================================================
+  // POINTER GLOW
+  // =====================================================
+
+  const handlePointerMove = (
+    e: PointerEvent<HTMLDivElement>
+  ) => {
+    if (
+      prefersReducedMotion ||
+      e.pointerType === "touch"
+    ) {
+      return;
+    }
+
+    const rect =
+      e.currentTarget.getBoundingClientRect();
+
     glowX.set(e.clientX - rect.left);
     glowY.set(e.clientY - rect.top);
   };
@@ -302,18 +593,50 @@ function DottedBrandMark() {
     <div
       ref={containerRef}
       onPointerMove={handlePointerMove}
-      className="relative h-[220px] w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] sm:h-[280px] lg:h-[340px]"
+      className="
+        relative
+        h-[220px]
+        w-full
+        overflow-hidden
+        rounded-xl
+        border
+        border-white/10
+        bg-white/[0.02]
+        sm:h-[280px]
+        lg:h-[340px]
+      "
     >
-      <canvas ref={canvasRef} className="absolute inset-0" />
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0"
+      />
+
       {!prefersReducedMotion && (
         <motion.div
           aria-hidden
-          style={{ background: glow, mixBlendMode: "overlay" }}
-          className="pointer-events-none absolute inset-0"
+          style={{
+            background: glow,
+            mixBlendMode: "overlay",
+          }}
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+          "
         />
       )}
-      <span className="absolute left-5 top-5 text-xs font-medium tracking-wide text-white/50">
-      </span>
+
+      <span
+        className="
+          absolute
+          left-5
+          top-5
+          text-xs
+          font-medium
+          tracking-wide
+          text-white/50
+        "
+      />
     </div>
   );
 }
@@ -325,8 +648,12 @@ function DottedBrandMark() {
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-[#050505]">
-      <div className="mx-auto max-w-[1440px] px-16 py-10 sm:px-6 lg:px-10">
-        {/* Dotted brand mark + Header */}
+      <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-10">
+
+        {/* =================================================
+            DOTTED BRAND MARK + HEADER
+        ================================================= */}
+
         <section className="mb-16">
           <Reveal>
             <DottedBrandMark />
@@ -346,23 +673,32 @@ export default function AboutPage() {
               </div>
             </Reveal>
 
-            <Reveal delay={0.1} className="max-w-2xl">
-              <p className="mb-3 text-sm font-medium text-[#8B5CF6]">ABOUT ME</p>
+            <Reveal
+              delay={0.1}
+              className="max-w-2xl"
+            >
+              <p className="mb-3 text-sm font-medium text-[#8B5CF6]">
+                ABOUT ME
+              </p>
+
               <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                 Ade Maulana Hidayah
               </h1>
+
               <p className="mt-4 text-base leading-7 text-white/50 sm:text-lg">
-                Saya Ade Maulana Hidayah, seorang programmer dengan fokus pada
-                pengembangan aplikasi web dan pengalaman di sisi frontend
-                maupun backend.
+                Saya Ade Maulana Hidayah, seorang programmer
+                dengan fokus pada pengembangan aplikasi web
+                dan pengalaman di sisi frontend maupun backend.
               </p>
             </Reveal>
           </div>
         </section>
 
-        {/* Profile */}
+        {/* =================================================
+            PROFILE
+        ================================================= */}
+
         <section className="mb-24 grid gap-12 md:grid-cols-[1.15fr_0.85fr] md:items-center">
-          {/* Profile */}
           <Reveal>
             <div className="max-w-2xl">
               <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-[#8B5CF6]">
@@ -375,51 +711,50 @@ export default function AboutPage() {
 
               <div className="mt-6 space-y-4 text-sm leading-7 text-white/50 sm:text-base">
                 <p>
-                  I have a background in Information Systems with a strong
-                  interest in software development, especially modern web
-                  applications.
+                  I have a background in Information Systems
+                  with a strong interest in software development,
+                  especially modern web applications.
                 </p>
 
                 <p>
-                  I work across the frontend and backend, building REST APIs,
-                  managing databases, implementing authentication, and
-                  maintaining reliable web applications.
+                  I work across the frontend and backend,
+                  building REST APIs, managing databases,
+                  implementing authentication, and maintaining
+                  reliable web applications.
                 </p>
 
                 <p>
-                  I enjoy turning ideas and business requirements into
-                  structured, practical, and maintainable digital solutions.
+                  I enjoy turning ideas and business requirements
+                  into structured, practical, and maintainable
+                  digital solutions.
                 </p>
               </div>
             </div>
           </Reveal>
 
-          {/* Decorative visual */}
           <Reveal delay={0.1}>
             <TechBlocks />
           </Reveal>
         </section>
 
-
-        {/* =====================================================
+        {/* =================================================
             QUICK INFORMATION
-        ===================================================== */}
+        ================================================= */}
+
         <section className="mb-24 grid gap-12 md:grid-cols-[0.85fr_1.15fr] md:items-center">
-          {/* Decorative side */}
           <Reveal>
             <div className="hidden md:block">
               <div className="relative h-[260px] overflow-hidden border border-white/[0.06]">
-                {/* Grid */}
                 <div
                   className="
-                    absolute inset-0
+                    absolute
+                    inset-0
                     opacity-30
                     [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)]
                     [background-size:32px_32px]
                   "
                 />
 
-                {/* Purple blocks */}
                 <motion.div
                   className="absolute left-[20%] top-[25%] h-16 w-16 border border-[#8B5CF6]/30 bg-[#8B5CF6]/10"
                   animate={{
@@ -458,7 +793,6 @@ export default function AboutPage() {
                   }}
                 />
 
-                {/* Label */}
                 <div className="absolute bottom-4 left-4">
                   <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/20">
                     Developer / 02
@@ -468,10 +802,8 @@ export default function AboutPage() {
             </div>
           </Reveal>
 
-          {/* Quick Info */}
           <Reveal delay={0.1}>
-            <div className="w-full max-w-md md:ml-auto md:pr-6 lg:pr-10">
-              {/* Heading */}
+            <div className="mx-auto w-full max-w-md text-center md:ml-auto md:mr-0 md:text-left md:pr-6 lg:pr-10">
               <div className="mb-7">
                 <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-[#8B5CF6]">
                   02 / Information
@@ -482,7 +814,6 @@ export default function AboutPage() {
                 </h2>
               </div>
 
-              {/* Information */}
               <div className="divide-y divide-white/[0.07]">
                 {[
                   {
@@ -512,7 +843,6 @@ export default function AboutPage() {
                   </div>
                 ))}
 
-                {/* Availability */}
                 <div className="pt-4">
                   <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/30">
                     Availability
@@ -521,6 +851,7 @@ export default function AboutPage() {
                   <div className="mt-1.5 flex items-center gap-2">
                     <span className="relative flex h-2 w-2 shrink-0">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10B981] opacity-50" />
+
                       <span className="relative inline-flex h-2 w-2 rounded-full bg-[#10B981]" />
                     </span>
 
@@ -534,10 +865,16 @@ export default function AboutPage() {
           </Reveal>
         </section>
 
-        {/* What I Do */}
+        {/* =================================================
+            WHAT I DO
+        ================================================= */}
+
         <section className="mb-20">
           <Reveal className="mb-8">
-            <p className="text-xs text-[#8B5CF6]">EXPERTISE</p>
+            <p className="text-xs text-[#8B5CF6]">
+              SERVICES
+            </p>
+
             <h2 className="mt-2 text-2xl font-semibold text-white">
               What I Do
             </h2>
@@ -546,20 +883,140 @@ export default function AboutPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             {services.map((service, index) => {
               const Icon = service.icon;
+
               return (
-                <Reveal key={service.title} delay={index * 0.06}>
-                  <TiltCard accent={service.color} className="h-full">
-                    <div className="p-5">
+                <Reveal
+                  key={service.title}
+                  delay={index * 0.08}
+                >
+                  <TiltCard accent={service.color}>
+                    {/* RGB Border Glow */}
+                    <div
+                      className="
+                        pointer-events-none
+                        absolute
+                        -inset-px
+                        rounded-[inherit]
+                        opacity-0
+                        transition-opacity
+                        duration-300
+                        group-hover:opacity-100
+                      "
+                      style={{
+                        background: `
+                          radial-gradient(
+                            180px circle at var(--mouse-x) var(--mouse-y),
+                            ${service.color}f2,
+                            rgba(59, 130, 246, 0.45) 30%,
+                            rgba(239, 68, 68, 0.35) 50%,
+                            transparent 75%
+                          )
+                        `,
+                      }}
+                    />
+
+                    {/* Inner Black Surface */}
+                    <div
+                      className="
+                        pointer-events-none
+                        absolute
+                        inset-px
+                        rounded-[inherit]
+                        bg-[#050505]
+                      "
+                    />
+
+                    {/* Cursor Distortion / Ripple */}
+                    <div
+                      className="
+                        pointer-events-none
+                        absolute
+                        h-32
+                        w-32
+                        -translate-x-1/2
+                        -translate-y-1/2
+                        rounded-full
+                        opacity-0
+                        blur-xl
+                        transition-opacity
+                        duration-300
+                        group-hover:opacity-100
+                      "
+                      style={{
+                        left: "var(--mouse-x)",
+                        top: "var(--mouse-y)",
+                        background: `
+                          radial-gradient(
+                            circle,
+                            ${service.color}2e 0%,
+                            rgba(59, 130, 246, 0.10) 35%,
+                            rgba(239, 68, 68, 0.06) 55%,
+                            transparent 75%
+                          )
+                        `,
+                        transform:
+                          "translate(-50%, -50%) scale(1.15)",
+                      }}
+                    />
+
+                    {/* RGB Shadow */}
+                    <div
+                      className="
+                        pointer-events-none
+                        absolute
+                        -inset-2
+                        -z-10
+                        rounded-[inherit]
+                        opacity-0
+                        blur-xl
+                        transition-opacity
+                        duration-500
+                        group-hover:opacity-70
+                      "
+                      style={{
+                        background: `
+                          radial-gradient(
+                            220px circle at var(--mouse-x) var(--mouse-y),
+                            ${service.color}59,
+                            rgba(59, 130, 246, 0.18) 35%,
+                            rgba(239, 68, 68, 0.14) 55%,
+                            transparent 75%
+                          )
+                        `,
+                      }}
+                    />
+
+                    {/* Content */}
+                    <div className="relative z-10 p-5">
+                      {/* Icon */}
                       <div
-                        className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
-                        style={{ backgroundColor: `${service.color}1A`, color: service.color }}
+                        className="
+                          mb-5
+                          flex
+                          h-11
+                          w-11
+                          items-center
+                          justify-center
+                          border
+                          border-white/[0.06]
+                          bg-[#050505]
+                          transition-all
+                          duration-300
+                        "
+                        style={{
+                          color: service.color,
+                        }}
                       >
                         <Icon size={20} />
                       </div>
+
+                      {/* Title */}
                       <h3 className="text-base font-semibold text-white">
                         {service.title}
                       </h3>
-                      <p className="mt-2 text-sm leading-6 text-white/50">
+
+                      {/* Description */}
+                      <p className="mt-2 text-sm leading-6 text-white/45">
                         {service.description}
                       </p>
                     </div>
@@ -570,10 +1027,16 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Skills */}
+        {/* =================================================
+            SKILLS
+        ================================================= */}
+
         <section className="mb-20">
           <Reveal className="mb-8">
-            <p className="text-xs text-[#8B5CF6]">TECHNOLOGIES</p>
+            <p className="text-xs text-[#8B5CF6]">
+              TECHNOLOGIES
+            </p>
+
             <h2 className="mt-2 text-2xl font-semibold text-white">
               Technical Skills
             </h2>
@@ -582,19 +1045,33 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {skills.map((skill, index) => {
               const Icon = skill.icon;
+
               return (
-                <Reveal key={skill.name} delay={Math.min(index * 0.03, 0.4)}>
-                  <SkillTile name={skill.name} icon={Icon} color={skill.color} />
+                <Reveal
+                  key={skill.name}
+                  delay={Math.min(index * 0.03, 0.4)}
+                >
+                  <SkillTile
+                    name={skill.name}
+                    icon={Icon}
+                    color={skill.color}
+                  />
                 </Reveal>
               );
             })}
           </div>
         </section>
 
-        {/* Experience */}
+        {/* =================================================
+            EXPERIENCE
+        ================================================= */}
+
         <section className="mb-20">
           <Reveal className="mb-8">
-            <p className="text-xs text-[#8B5CF6]">EXPERIENCE</p>
+            <p className="text-xs text-[#8B5CF6]">
+              EXPERIENCE
+            </p>
+
             <h2 className="mt-2 text-2xl font-semibold text-white">
               Work Experience
             </h2>
@@ -602,54 +1079,192 @@ export default function AboutPage() {
 
           <div className="space-y-4">
             {experiences.map((experience, index) => (
-              <Reveal key={`${experience.role}-${experience.company}`} delay={index * 0.08}>
-                <TiltCard accent="#8B5CF6">
-                  <div className="flex gap-4 p-5">
-                    <div className="hidden h-10 w-10 shrink-0 items-center justify-center bg-white/5 text-[#8B5CF6] sm:flex">
-                      <BriefcaseBusiness size={19} />
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-semibold text-white">
-                          {experience.role}
-                        </h3>
-                        <span className="text-xs text-white/30">•</span>
-                        <span className="text-sm text-[#8B5CF6]">
-                          {experience.period}
-                        </span>
-                      </div>
-                      <p className="mt-1 text-sm text-white/40">
-                        {experience.company}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-white/50">
-                        {experience.description}
-                      </p>
-                    </div>
+              <Reveal
+                key={`${experience.role}-${experience.company}`}
+                delay={index * 0.08}
+              >
+               <TiltCard accent="#8B5CF6">
+                {/* RGB Border Glow */}
+                <div
+                  className="
+                    pointer-events-none
+                    absolute
+                    -inset-px
+                    rounded-[inherit]
+                    opacity-0
+                    transition-opacity
+                    duration-300
+                    group-hover:opacity-100
+                  "
+                  style={{
+                    background: `
+                      radial-gradient(
+                        180px circle at var(--mouse-x) var(--mouse-y),
+                        rgba(139, 92, 246, 0.95),
+                        rgba(59, 130, 246, 0.45) 30%,
+                        rgba(239, 68, 68, 0.35) 50%,
+                        transparent 75%
+                      )
+                    `,
+                  }}
+                />
+
+                {/* Inner Black Surface */}
+                <div
+                  className="
+                    pointer-events-none
+                    absolute
+                    inset-px
+                    rounded-[inherit]
+                    bg-[#050505]
+                  "
+                />
+
+                {/* Cursor Distortion / Ripple */}
+                <div
+                  className="
+                    pointer-events-none
+                    absolute
+                    h-32
+                    w-32
+                    -translate-x-1/2
+                    -translate-y-1/2
+                    rounded-full
+                    opacity-0
+                    blur-xl
+                    transition-opacity
+                    duration-300
+                    group-hover:opacity-100
+                  "
+                  style={{
+                    left: "var(--mouse-x)",
+                    top: "var(--mouse-y)",
+                    background: `
+                      radial-gradient(
+                        circle,
+                        rgba(139, 92, 246, 0.18) 0%,
+                        rgba(59, 130, 246, 0.10) 35%,
+                        rgba(239, 68, 68, 0.06) 55%,
+                        transparent 75%
+                      )
+                    `,
+                    transform: "translate(-50%, -50%) scale(1.15)",
+                  }}
+                />
+
+                {/* RGB Shadow */}
+                <div
+                  className="
+                    pointer-events-none
+                    absolute
+                    -inset-2
+                    -z-10
+                    rounded-[inherit]
+                    opacity-0
+                    blur-xl
+                    transition-opacity
+                    duration-500
+                    group-hover:opacity-70
+                  "
+                  style={{
+                    background: `
+                      radial-gradient(
+                        220px circle at var(--mouse-x) var(--mouse-y),
+                        rgba(139, 92, 246, 0.35),
+                        rgba(59, 130, 246, 0.18) 35%,
+                        rgba(239, 68, 68, 0.14) 55%,
+                        transparent 75%
+                      )
+                    `,
+                  }}
+                />
+
+                {/* Content */}
+                <div className="relative z-10 flex gap-4">
+                  {/* Icon */}
+                  <div
+                    className="
+                      hidden
+                      h-10
+                      w-10
+                      shrink-0
+                      items-center
+                      justify-center
+                      border
+                      border-white/[0.06]
+                      bg-[#050505]
+                      text-[#8B5CF6]
+                      transition-all
+                      duration-300
+                      group-hover:border-[#8B5CF6]/30
+                      group-hover:shadow-[0_0_20px_rgba(139,92,246,0.15)]
+                      sm:flex
+                    "
+                  >
+                    <BriefcaseBusiness size={19} />
                   </div>
-                </TiltCard>
+
+                  {/* Experience Information */}
+                  <div className="min-w-0">
+                    {/* Role + Period */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-semibold text-white">
+                        {experience.role}
+                      </h3>
+
+                      <span className="text-xs text-white/30">
+                        •
+                      </span>
+
+                      <span className="text-sm text-[#8B5CF6]">
+                        {experience.period}
+                      </span>
+                    </div>
+
+                    {/* Company */}
+                    <p className="mt-1 text-sm text-white/40">
+                      {experience.company}
+                    </p>
+
+                    {/* Description */}
+                    <p className="mt-3 text-sm leading-6 text-white/50">
+                      {experience.description}
+                    </p>
+                  </div>
+                </div>
+              </TiltCard>
               </Reveal>
             ))}
           </div>
         </section>
 
-        {/* Values */}
+        {/* =================================================
+            VALUES
+        ================================================= */}
+
         <Reveal className="border-t border-white/10 pt-12">
           <div className="max-w-3xl">
-            <p className="text-xs text-[#8B5CF6]">WORKING PRINCIPLES</p>
+            <p className="text-xs text-[#8B5CF6]">
+              WORKING PRINCIPLES
+            </p>
+
             <h2 className="mt-2 text-2xl font-semibold text-white">
               How I Work
             </h2>
+
             <div className="mt-5 space-y-3 text-base leading-7 text-white/50">
               <p>
-                Saya berfokus membangun aplikasi dengan struktur kode yang
-                rapi, efisien, dan mudah dikembangkan untuk kebutuhan jangka
-                panjang.
+                Saya berfokus membangun aplikasi dengan struktur
+                kode yang rapi, efisien, dan mudah dikembangkan
+                untuk kebutuhan jangka panjang.
               </p>
+
               <p>
-                Terbiasa melakukan analisis masalah, debugging, membaca
-                dokumentasi, menggunakan Git dalam workflow pengembangan,
-                senang mengeksplorasi teknologi baru untuk meningkatkan
-                kualitas setiap project yang dikerjakan.
+                Terbiasa melakukan analisis masalah, debugging,
+                membaca dokumentasi, menggunakan Git dalam
+                workflow pengembangan, senang mengeksplorasi
+                teknologi baru untuk meningkatkan kualitas setiap
+                project yang dikerjakan.
               </p>
             </div>
           </div>
@@ -660,7 +1275,7 @@ export default function AboutPage() {
 }
 
 // =====================================================
-// Skill tile — hover distortion ringan (tilt + scale icon)
+// SKILL TILE
 // =====================================================
 
 function SkillTile({
@@ -669,21 +1284,53 @@ function SkillTile({
   color,
 }: {
   name: string;
-  icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>;
+  icon: React.ComponentType<{
+    size?: number;
+    className?: string;
+    style?: React.CSSProperties;
+  }>;
   color: string;
 }) {
   const prefersReducedMotion = useReducedMotion();
+
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
-  const springConfig = { stiffness: 250, damping: 20 };
-  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [8, -8]), springConfig);
-  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-8, 8]), springConfig);
 
-  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion || e.pointerType === "touch") return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    pointerX.set((e.clientX - rect.left) / rect.width - 0.5);
-    pointerY.set((e.clientY - rect.top) / rect.height - 0.5);
+  const springConfig = {
+    stiffness: 250,
+    damping: 20,
+  };
+
+  const rotateX = useSpring(
+    useTransform(pointerY, [-0.5, 0.5], [8, -8]),
+    springConfig
+  );
+
+  const rotateY = useSpring(
+    useTransform(pointerX, [-0.5, 0.5], [-8, 8]),
+    springConfig
+  );
+
+  const handlePointerMove = (
+    e: PointerEvent<HTMLDivElement>
+  ) => {
+    if (
+      prefersReducedMotion ||
+      e.pointerType === "touch"
+    ) {
+      return;
+    }
+
+    const rect =
+      e.currentTarget.getBoundingClientRect();
+
+    pointerX.set(
+      (e.clientX - rect.left) / rect.width - 0.5
+    );
+
+    pointerY.set(
+      (e.clientY - rect.top) / rect.height - 0.5
+    );
   };
 
   const handlePointerLeave = () => {
@@ -695,14 +1342,38 @@ function SkillTile({
     <motion.div
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      style={{ rotateX, rotateY, transformPerspective: 500 }}
-      className="group flex h-16 items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] px-4 transition-colors hover:border-white/20 hover:bg-white/[0.05]"
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 500,
+      }}
+      className="
+        group
+        flex
+        h-16
+        items-center
+        gap-3
+        rounded-lg
+        border
+        border-white/10
+        bg-white/[0.02]
+        px-4
+        transition-colors
+        hover:border-white/20
+        hover:bg-white/[0.05]
+      "
     >
       <Icon
         size={22}
-        className="shrink-0 transition-transform duration-300 group-hover:scale-110"
+        className="
+          shrink-0
+          transition-transform
+          duration-300
+          group-hover:scale-110
+        "
         style={{ color }}
       />
+
       <span className="truncate text-sm font-medium text-white/70 group-hover:text-white">
         {name}
       </span>
