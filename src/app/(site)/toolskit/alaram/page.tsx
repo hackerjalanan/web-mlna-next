@@ -71,15 +71,22 @@ const typeOf = (id?: string) => TYPES.find((x) => x.id === id) ?? TYPES[0];
 const pad = (n: number) => String(n).padStart(2, "0");
 
 function getTime(date: Date, tz: string) {
-  const p = new Intl.DateTimeFormat("en-GB", {
+  const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: tz,
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: false,
+    hourCycle: "h23",
   }).formatToParts(date);
-  const get = (t: string) => Number(p.find((x) => x.type === t)?.value ?? 0) % 24;
-  return { h: get("hour"), m: get("minute"), s: get("second") };
+
+  const get = (type: string) =>
+    Number(parts.find((part) => part.type === type)?.value ?? 0);
+
+  return {
+    h: get("hour") % 24,
+    m: get("minute"),
+    s: get("second"),
+  };
 }
 
 export default function Page() {
