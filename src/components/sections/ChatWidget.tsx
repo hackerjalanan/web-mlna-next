@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Bot } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -102,14 +102,19 @@ export default function ChatWidget({ onClose }: { onClose?: () => void }) {
     <div className="w-80 h-[28rem] bg-[#041025] border border-cyan-900 rounded-xl shadow-lg flex flex-col overflow-hidden">
 
       <div className="p-3 bg-gradient-to-r from-[#06102a] to-[#0a2a4a] text-cyan-200 font-semibold flex justify-between items-center">
-        Tanya asisten AI Ade
 
-        <button 
+        <div className="flex items-center gap-2">
+          <Bot size={20} className="text-cyan-400" />
+          <span>Asisten AI</span>
+        </div>
+
+        <button
           onClick={onClose}
-          className="text-cyan-300 hover:text-white"
+          className="text-cyan-300 hover:text-white transition-colors"
         >
-          <X size={18}/>
+          <X size={18} />
         </button>
+
       </div>
 
 
@@ -123,22 +128,21 @@ export default function ChatWidget({ onClose }: { onClose?: () => void }) {
         )}
 
 
-        {messages.map((m)=>(
+        {messages.map((m) => (
           <div
             key={m.id}
             className={
               m.role === 'user'
-              ? 'text-right'
-              : 'text-left'
+                ? 'text-right'
+                : 'text-left'
             }
           >
 
             <div
-              className={`inline-block px-3 py-2 rounded-lg max-w-[85%] ${
-                m.role === 'user'
+              className={`inline-block px-3 py-2 rounded-lg max-w-[85%] ${m.role === 'user'
                   ? 'bg-gradient-to-r from-[#0066ff] to-[#00d4ff] text-[#02121a]'
                   : 'bg-[#07172a] text-cyan-100 border border-cyan-800'
-              }`}
+                }`}
             >
               {m.role === 'assistant' ? (
                 <ReactMarkdown
@@ -204,14 +208,14 @@ export default function ChatWidget({ onClose }: { onClose?: () => void }) {
 
 
 
-      <form 
+      <form
         onSubmit={onSubmit}
         className="p-2 border-t border-cyan-900 flex gap-2 bg-[#021826]"
       >
 
         <input
           value={input}
-          onChange={(e)=>setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Tulis pertanyaan..."
           className="flex-1 border border-cyan-800 rounded px-2 py-1 text-sm outline-none bg-transparent text-cyan-100 placeholder-cyan-400"
           disabled={isLoading}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaQrcode, FaPenFancy, FaFileWord, FaKey, FaMagnifyingGlass, FaImage, FaArrowLeft, FaCode, FaPalette, FaEraser, FaLayerGroup, FaWeightScale } from 'react-icons/fa6';
+import { FaQrcode, FaPenFancy, FaFileWord, FaChartLine, FaBell,FaKeyboard, FaKey, FaMagnifyingGlass, FaImage, FaArrowLeft, FaCode, FaPalette, FaEraser, FaLayerGroup, FaWeightScale, FaGaugeHigh } from 'react-icons/fa6';
 const TOOLS = [
   { name: 'QR Code Generator', href: '/toolskit/qr-code', icon: FaQrcode, color: 'text-cyan-400 bg-cyan-400/10' },
   { name: 'Remove Background', href: '/toolskit/remove-background', icon: FaEraser, color: 'text-rose-400 bg-rose-400/10' },
@@ -12,11 +12,15 @@ const TOOLS = [
   { name: 'JSON Formatter', href: '/toolskit/json-formatter', icon: FaCode, color: 'text-violet-400 bg-violet-400/10' },
   { name: 'Color Palette', href: '/toolskit/color-palette', icon: FaPalette, color: 'text-pink-400 bg-pink-400/10' },
   { name: 'TSX Formatter', href: '/toolskit/tsx-formatter', icon: FaCode, color: 'text-sky-400 bg-sky-400/10' },
+  { name: 'CSAT Presentation', href: '/toolskit/csat-presentation', icon: FaGaugeHigh, color: 'text-orange-400 bg-orange-400/10' },
+  { name: 'Productivity Tools', href: '/toolskit/productivity', icon: FaChartLine,  color: 'text-orange-400 bg-orange-400/10' },
   { name: 'Gabung PDF/Gambar', href: '/toolskit/merge-pdf', icon: FaLayerGroup, color: 'text-orange-400 bg-orange-400/10' },
   { name: 'PDF to DOCS', href: '/toolskit/pdf-to-docs', icon: FaFileWord, color: 'text-blue-400 bg-blue-400/10' },
   { name: 'Hitung BMI', href: '/toolskit/kalkulator-bmi', icon: FaWeightScale, color: 'text-violet-400 bg-violet-400/10' },
   { name: 'Hitung Body Fat', href: '/toolskit/kalkulator-body-fat', icon: FaWeightScale, color: 'text-pink-400 bg-pink-400/10' },
   { name: 'Paraprase', href: '/toolskit/paraprase', icon: FaPenFancy, color: 'text-orange-400 bg-orange-400/10' },
+  { name: 'Alarm', href: '/toolskit/alaram', icon: FaBell, color: 'text-rose-400 bg-rose-400/10'},
+  { name: 'Typing test', href: '/toolskit/typing-kpm', icon: FaKeyboard,   color: 'text-cyan-400 bg-cyan-400/10'},
 ];
 
 export default function ToolsLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -27,7 +31,7 @@ export default function ToolsLayout({ children }: Readonly<{ children: React.Rea
   const activeTool = TOOLS.find((tool) => tool.href === pathname);
 
   return (
-    <main className="min-h-screen px-4 py-15  md:px-4 py-7">
+    <main className="min-h-screen px-4 py-0  md:px-4 py-2">
       <div className="mx-auto max-w-[1440px]">
         {!isToolPage ? (
           <>
@@ -68,7 +72,7 @@ export default function ToolsLayout({ children }: Readonly<{ children: React.Rea
           </>
         ) : (
           <section>
-            <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
+            <div className="mb-0 flex items-center justify-between border-b border-white/10 pb-4">
               <Link href="/toolskit" className="flex items-center gap-2 text-sm text-slate-400 transition hover:text-cyan-400">
                 <FaArrowLeft size={13} />
                 Kembali
